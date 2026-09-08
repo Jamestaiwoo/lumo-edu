@@ -47,12 +47,26 @@ export function PaperTrading() {
     stopNum > 0 && ((side === "long" && stopNum >= price) || (side === "short" && stopNum <= price));
 
   async function placeTrade() {
-    if (!stopNum) return toast.error("Set a stop loss first — that's the rule here.");
-    if (stopWrongSide)
-      return toast.error(side === "long" ? "A long stop must sit below price." : "A short stop must sit above price.");
-    if (qty < 1) return toast.error("That risk gives less than one share. Widen risk or tighten the stop.");
-    if (Number(riskPct) > 5) return toast.error("Risk is capped at 5% per trade in the simulator.");
-    if (openTrades.length >= 5) return toast.error("Maximum 5 open practice positions.");
+    if (!stopNum) {
+      toast.error("Set a stop loss first — that's the rule here.");
+      return;
+    }
+    if (stopWrongSide) {
+      toast.error(side === "long" ? "A long stop must sit below price." : "A short stop must sit above price.");
+      return;
+    }
+    if (qty < 1) {
+      toast.error("That risk gives less than one share. Widen risk or tighten the stop.");
+      return;
+    }
+    if (Number(riskPct) > 5) {
+      toast.error("Risk is capped at 5% per trade in the simulator.");
+      return;
+    }
+    if (openTrades.length >= 5) {
+      toast.error("Maximum 5 open practice positions.");
+      return;
+    }
 
     await open.mutateAsync({
       symbol,

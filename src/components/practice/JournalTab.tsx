@@ -20,7 +20,10 @@ export function JournalTab() {
   const [tradeId, setTradeId] = useState<string>("");
 
   async function save() {
-    if (!title.trim()) return toast.error("Give the entry a title.");
+    if (!title.trim()) {
+      toast.error("Give the entry a title.");
+      return;
+    }
     await add.mutateAsync({
       title: title.trim(),
       notes: notes.trim(),
