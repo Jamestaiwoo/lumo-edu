@@ -11,9 +11,9 @@ import { ACHIEVEMENT_MAP } from "@/lib/api";
 export const Route = createFileRoute("/_authenticated/learn/$lessonId")({
   head: () => ({
     meta: [
-      { title: "Lesson — TradeLingo" },
+      { title: "Lesson — Lumo" },
       { name: "description", content: "Interactive trading questions with instant feedback and explanations." },
-      { property: "og:title", content: "Lesson — TradeLingo" },
+      { property: "og:title", content: "Lesson — Lumo" },
       { property: "og:description", content: "Interactive trading questions with instant feedback and explanations." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

@@ -7,15 +7,16 @@ import { Disclaimer } from "@/components/Disclaimer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { LumoLogo } from "@/components/LumoLogo";
 
 export const Route = createFileRoute("/auth")({
   ssr: false,
   head: () => ({
     meta: [
-      { title: "Sign in — TradeLingo" },
-      { name: "description", content: "Create your free TradeLingo account and start learning trading fundamentals." },
-      { property: "og:title", content: "Sign in — TradeLingo" },
-      { property: "og:description", content: "Create your free TradeLingo account and start learning trading fundamentals." },
+      { title: "Sign in — Lumo" },
+      { name: "description", content: "Create your free Lumo account and start learning trading fundamentals." },
+      { property: "og:title", content: "Sign in — Lumo" },
+      { property: "og:description", content: "Create your free Lumo account and start learning trading fundamentals." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -88,6 +89,7 @@ function AuthPage() {
   return (
     <div className="min-h-screen bg-background">
       <div className="mx-auto flex min-h-screen max-w-md flex-col justify-center gap-6 px-5 py-10">
+        <LumoLogo className="size-14" showName />
         <div>
           <h1 className="text-3xl font-bold">
             {mode === "signup" ? "Create your account" : "Welcome back"}

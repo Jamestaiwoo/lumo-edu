@@ -10,12 +10,12 @@ import { JournalTab } from "@/components/practice/JournalTab";
 export const Route = createFileRoute("/_authenticated/practice")({
   head: () => ({
     meta: [
-      { title: "Practice — TradeLingo" },
+      { title: "Practice — Lumo" },
       {
         name: "description",
         content: "Drill your weak topics, size positions with the risk calculator, run simulated paper trades and journal them.",
       },
-      { property: "og:title", content: "Practice — TradeLingo" },
+      { property: "og:title", content: "Practice — Lumo" },
       {
         property: "og:description",
         content: "Drill weak topics, size positions, run simulated paper trades and keep a trade journal.",

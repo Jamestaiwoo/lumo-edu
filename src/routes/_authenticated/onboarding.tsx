@@ -7,14 +7,15 @@ import { Label } from "@/components/ui/label";
 import { Disclaimer } from "@/components/Disclaimer";
 import { useProfile, useUpdateProfile } from "@/lib/api";
 import { Check } from "lucide-react";
+import { LumoLogo } from "@/components/LumoLogo";
 
 export const Route = createFileRoute("/_authenticated/onboarding")({
   head: () => ({
     meta: [
-      { title: "Set up your plan — TradeLingo" },
-      { name: "description", content: "Tell TradeLingo your experience level and daily goal to personalise your learning path." },
-      { property: "og:title", content: "Set up your plan — TradeLingo" },
-      { property: "og:description", content: "Personalise your TradeLingo learning path in three quick steps." },
+      { title: "Set up your plan — Lumo" },
+      { name: "description", content: "Tell Lumo your experience level and daily goal to personalise your learning path." },
+      { property: "og:title", content: "Set up your plan — Lumo" },
+      { property: "og:description", content: "Personalise your Lumo learning path in three quick steps." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -75,6 +76,7 @@ function Onboarding() {
   return (
     <div className="min-h-screen bg-background">
       <div className="mx-auto flex min-h-screen max-w-md flex-col gap-6 px-5 py-10">
+        <LumoLogo className="size-11" showName />
         <div className="flex gap-1.5">
           {[0, 1, 2, 3].map((i) => (
             <span
