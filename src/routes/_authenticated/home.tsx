@@ -12,9 +12,9 @@ import { supabase } from "@/integrations/supabase/client";
 export const Route = createFileRoute("/_authenticated/home")({
   head: () => ({
     meta: [
-      { title: "Your dashboard — TradeLingo" },
+      { title: "Your dashboard — Lumo" },
       { name: "description", content: "Your streak, XP, daily goal and next trading lesson at a glance." },
-      { property: "og:title", content: "Your dashboard — TradeLingo" },
+      { property: "og:title", content: "Your dashboard — Lumo" },
       { property: "og:description", content: "Your streak, XP, daily goal and next trading lesson at a glance." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

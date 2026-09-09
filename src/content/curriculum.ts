@@ -866,4 +866,4 @@ export const ACHIEVEMENTS: { code: string; title: string; description: string; i
 ];
 
 export const DISCLAIMER =
-  "TradeLingo is an educational platform and does not provide financial or investment advice.";
+  "Lumo is an educational platform and does not provide financial or investment advice.";

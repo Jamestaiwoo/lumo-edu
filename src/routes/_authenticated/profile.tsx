@@ -16,9 +16,9 @@ import { levelFromXp, money } from "@/lib/game";
 export const Route = createFileRoute("/_authenticated/profile")({
   head: () => ({
     meta: [
-      { title: "Profile — TradeLingo" },
-      { name: "description", content: "Your XP, level, streaks, achievements and topic accuracy in TradeLingo." },
-      { property: "og:title", content: "Profile — TradeLingo" },
+      { title: "Profile — Lumo" },
+      { name: "description", content: "Your XP, level, streaks, achievements and topic accuracy in Lumo." },
+      { property: "og:title", content: "Profile — Lumo" },
       { property: "og:description", content: "Your XP, level, streaks, achievements and topic accuracy." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

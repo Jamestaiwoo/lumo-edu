@@ -1,19 +1,20 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Flame, LineChart, ShieldCheck, Sparkles, Zap } from "lucide-react";
+import { Flame, LineChart, ShieldCheck, Zap } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Disclaimer } from "@/components/Disclaimer";
+import { LumoLogo } from "@/components/LumoLogo";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "TradeLingo — Learn trading. One decision at a time." },
+      { title: "Lumo — Learn trading. One decision at a time." },
       {
         name: "description",
         content:
           "Bite-sized trading lessons, streaks, an AI study coach and a $10,000 simulated paper account. Educational only.",
       },
-      { property: "og:title", content: "TradeLingo — Learn trading. One decision at a time." },
+      { property: "og:title", content: "Lumo — Learn trading. One decision at a time." },
       {
         property: "og:description",
         content:
@@ -36,9 +37,7 @@ function Landing() {
   return (
     <div className="min-h-screen bg-background">
       <div className="mx-auto flex max-w-md flex-col gap-8 px-5 py-12">
-        <div className="flex items-center gap-2 text-sm font-semibold tracking-wide text-primary">
-          <Sparkles className="size-4" aria-hidden /> TradeLingo
-        </div>
+        <LumoLogo className="size-12" showName />
 
         <div>
           <h1 className="text-4xl font-bold leading-[1.05]">

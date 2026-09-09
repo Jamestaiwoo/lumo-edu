@@ -13,10 +13,10 @@ import { TOPIC_LABELS } from "@/content/curriculum";
 export const Route = createFileRoute("/_authenticated/coach")({
   head: () => ({
     meta: [
-      { title: "AI Coach — TradeLingo" },
-      { name: "description", content: "Ask the TradeLingo coach to explain trading concepts in plain language. Education only." },
-      { property: "og:title", content: "AI Coach — TradeLingo" },
-      { property: "og:description", content: "Ask the TradeLingo coach to explain trading concepts in plain language." },
+      { title: "AI Coach — Lumo" },
+      { name: "description", content: "Ask the Lumo coach to explain trading concepts in plain language. Education only." },
+      { property: "og:title", content: "AI Coach — Lumo" },
+      { property: "og:description", content: "Ask the Lumo coach to explain trading concepts in plain language." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -43,7 +43,7 @@ function CoachPage() {
     {
       role: "assistant",
       content:
-        "Hi! I'm your TradeLingo coach. I explain concepts — I never tell you what to buy or sell. What would you like to understand today?",
+        "Hi! I'm your Lumo coach. I explain concepts — I never tell you what to buy or sell. What would you like to understand today?",
     },
   ]);
   const [input, setInput] = useState("");

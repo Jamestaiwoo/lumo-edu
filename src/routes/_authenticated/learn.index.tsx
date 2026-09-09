@@ -8,9 +8,9 @@ import { LESSON_ORDER, WORLDS } from "@/content/curriculum";
 export const Route = createFileRoute("/_authenticated/learn/")({
   head: () => ({
     meta: [
-      { title: "Learning path — TradeLingo" },
+      { title: "Learning path — Lumo" },
       { name: "description", content: "Three worlds of bite-sized trading lessons, unlocked one step at a time." },
-      { property: "og:title", content: "Learning path — TradeLingo" },
+      { property: "og:title", content: "Learning path — Lumo" },
       { property: "og:description", content: "Three worlds of bite-sized trading lessons, unlocked one step at a time." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
