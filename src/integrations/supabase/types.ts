@@ -115,8 +115,71 @@ export type Database = {
         }
         Relationships: []
       }
+      paper_accounts: {
+        Row: {
+          created_at: string
+          current_balance: number
+          starting_balance: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          current_balance?: number
+          starting_balance?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          current_balance?: number
+          starting_balance?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      paper_ledger: {
+        Row: {
+          amount: number
+          balance_after: number
+          created_at: string
+          id: string
+          kind: string
+          trade_id: string | null
+          user_id: string
+        }
+        Insert: {
+          amount?: number
+          balance_after: number
+          created_at?: string
+          id?: string
+          kind: string
+          trade_id?: string | null
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          balance_after?: number
+          created_at?: string
+          id?: string
+          kind?: string
+          trade_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "paper_ledger_trade_id_fkey"
+            columns: ["trade_id"]
+            isOneToOne: false
+            referencedRelation: "paper_trades"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       paper_trades: {
         Row: {
+          account_id: string | null
           closed_at: string | null
           entry_price: number
           exit_price: number | null
@@ -134,6 +197,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          account_id?: string | null
           closed_at?: string | null
           entry_price: number
           exit_price?: number | null
@@ -151,6 +215,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          account_id?: string | null
           closed_at?: string | null
           entry_price?: number
           exit_price?: number | null
@@ -167,7 +232,15 @@ export type Database = {
           take_profit?: number | null
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "paper_trades_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "paper_accounts"
+            referencedColumns: ["user_id"]
+          },
+        ]
       }
       profiles: {
         Row: {
@@ -247,6 +320,33 @@ export type Database = {
           question_id?: string
           topic?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      reward_events: {
+        Row: {
+          created_at: string
+          id: string
+          kind: string
+          source_key: string
+          user_id: string
+          xp_awarded: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          kind: string
+          source_key: string
+          user_id: string
+          xp_awarded?: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          kind?: string
+          source_key?: string
+          user_id?: string
+          xp_awarded?: number
         }
         Relationships: []
       }
