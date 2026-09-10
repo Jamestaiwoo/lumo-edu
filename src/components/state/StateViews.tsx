@@ -98,7 +98,7 @@ export function QueryBoundary<T>({
   empty?: ReactNode;
   isEmpty?: (data: T) => boolean;
 }) {
-  if (query.isPending) return <LoadingState rows={loadingRows} />;
+  if (query.isPending) return <LoadingState rows={loadingRows ?? 3} />;
   if (query.isError) return <ErrorState error={query.error} onRetry={() => query.refetch()} />;
   const data = query.data as T;
   if (empty && isEmpty?.(data)) return <>{empty}</>;
