@@ -6,11 +6,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { INSTRUMENTS, priceAt, pnlFor, seriesFor } from "@/lib/market";
 import { money } from "@/lib/game";
-import { useCloseTrade, useOpenTrade, useProfile, useTrades } from "@/lib/api";
+import { MAX_OPEN_POSITIONS } from "@/lib/scoring";
+import { useCloseTrade, useOpenTrade, usePaperAccount, useTrades } from "@/lib/api";
+import { EmptyState, ErrorBanner, ErrorState, LoadingState } from "@/components/state/StateViews";
 
 export function PaperTrading() {
-  const { data: profile } = useProfile();
-  const { data: trades = [] } = useTrades();
+  const account = usePaperAccount();
+  const tradesQuery = useTrades();
   const open = useOpenTrade();
   const close = useCloseTrade();
 
@@ -26,9 +28,10 @@ export function PaperTrading() {
     return () => clearInterval(id);
   }, []);
 
+  const trades = tradesQuery.data ?? [];
   const price = priceAt(symbol);
   const series = seriesFor(symbol, 48);
-  const balance = Number(profile?.cash_balance ?? 10000);
+  const balance = Number(account.data?.current_balance ?? 0);
   const stopNum = Number(stop) || 0;
   const riskAmount = (balance * (Number(riskPct) || 0)) / 100;
   const perShare = stopNum > 0 ? Math.abs(price - stopNum) : 0;
@@ -43,47 +46,58 @@ export function PaperTrading() {
   const realised = closedTrades.reduce((s, t) => s + Number(t.pnl ?? 0), 0);
   const wins = closedTrades.filter((t) => Number(t.pnl ?? 0) > 0).length;
 
-  const stopWrongSide =
-    stopNum > 0 && ((side === "long" && stopNum >= price) || (side === "short" && stopNum <= price));
-
   async function placeTrade() {
-    if (!stopNum) {
-      toast.error("Set a stop loss first — that's the rule here.");
-      return;
+    try {
+      const res = await open.mutateAsync({
+        symbol,
+        side,
+        riskPct: Number(riskPct),
+        stopLoss: stopNum,
+        takeProfit: Number(take) || null,
+      });
+      setStop("");
+      setTake("");
+      toast.success(`Simulated ${res.side} ${res.quantity} ${res.symbol} @ ${res.entryPrice.toFixed(2)}`);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Could not place that trade.");
     }
-    if (stopWrongSide) {
-      toast.error(side === "long" ? "A long stop must sit below price." : "A short stop must sit above price.");
-      return;
-    }
-    if (qty < 1) {
-      toast.error("That risk gives less than one share. Widen risk or tighten the stop.");
-      return;
-    }
-    if (Number(riskPct) > 5) {
-      toast.error("Risk is capped at 5% per trade in the simulator.");
-      return;
-    }
-    if (openTrades.length >= 5) {
-      toast.error("Maximum 5 open practice positions.");
-      return;
-    }
+  }
 
-    await open.mutateAsync({
-      symbol,
-      side,
-      quantity: qty,
-      entry_price: price,
-      stop_loss: stopNum,
-      take_profit: Number(take) || null,
-      risk_amount: +riskAmount.toFixed(2),
-    });
-    setStop("");
-    setTake("");
-    toast.success(`Simulated ${side} ${qty} ${symbol} @ ${price}`);
+  const banner = (
+    <p className="rounded-xl border border-warning/50 bg-warning/10 px-3 py-2 text-center text-[11px] font-bold uppercase tracking-wide text-warning">
+      SIMULATED TRADING — NO REAL MONEY
+    </p>
+  );
+
+  if (account.isPending || tradesQuery.isPending) {
+    return (
+      <div className="flex flex-col gap-4">
+        {banner}
+        <LoadingState label="Loading your practice account…" rows={3} />
+      </div>
+    );
+  }
+
+  if (account.isError || tradesQuery.isError) {
+    return (
+      <div className="flex flex-col gap-4">
+        {banner}
+        <ErrorState
+          error={account.error ?? tradesQuery.error}
+          title="We couldn't load your practice account"
+          onRetry={() => {
+            account.refetch();
+            tradesQuery.refetch();
+          }}
+        />
+      </div>
+    );
   }
 
   return (
     <div className="flex flex-col gap-4">
+      {banner}
+
       <div className="surface rounded-2xl border border-border/60 p-4">
         <div className="flex items-baseline justify-between">
           <div>
@@ -153,25 +167,38 @@ export function PaperTrading() {
 
         <div className="mt-3 grid grid-cols-3 gap-2">
           <Field label="Risk %" value={riskPct} onChange={setRiskPct} />
-          <Field label="Stop loss" value={stop} onChange={setStop} placeholder={(price * (side === "long" ? 0.97 : 1.03)).toFixed(2)} />
+          <Field
+            label="Stop loss"
+            value={stop}
+            onChange={setStop}
+            placeholder={(price * (side === "long" ? 0.97 : 1.03)).toFixed(2)}
+          />
           <Field label="Take profit" value={take} onChange={setTake} placeholder="optional" />
         </div>
 
         <p className="mt-2 text-xs text-muted-foreground">
-          Size: <span className="font-semibold text-foreground">{qty} shares</span> · risking {money(riskAmount)}
+          Estimated size: <span className="font-semibold text-foreground">{qty} shares</span> · risking{" "}
+          {money(riskAmount)} · the server checks and recalculates this before anything is saved.
         </p>
 
-        <Button className="mt-3 h-12 w-full font-bold" onClick={placeTrade} disabled={open.isPending}>
-          {open.isPending ? "Placing…" : `Place simulated ${side}`}
-        </Button>
+        <div className="mt-3 space-y-2">
+          <ErrorBanner error={open.error} />
+          <Button className="h-12 w-full font-bold" onClick={placeTrade} disabled={open.isPending}>
+            {open.isPending ? "Placing…" : `Place simulated ${side}`}
+          </Button>
+          <p className="text-center text-[11px] text-muted-foreground">
+            Max {MAX_OPEN_POSITIONS} open practice positions · risk capped at 5% per trade
+          </p>
+        </div>
       </div>
 
       <section>
         <h3 className="mb-2 text-sm font-bold">Open positions</h3>
         {openTrades.length === 0 ? (
-          <p className="rounded-2xl border border-dashed border-border p-4 text-xs text-muted-foreground">
-            No open practice positions.
-          </p>
+          <EmptyState
+            title="No open practice positions"
+            description="Pick an instrument, set a stop, and place a simulated trade."
+          />
         ) : (
           <ul className="flex flex-col gap-2">
             {openTrades.map((t) => {
@@ -202,17 +229,26 @@ export function PaperTrading() {
                     className="mt-3 h-9 w-full text-xs font-semibold"
                     disabled={close.isPending}
                     onClick={async () => {
-                      const p = await close.mutateAsync({ trade: t, exitPrice: cur });
-                      toast.success(`Closed ${t.symbol} for ${p >= 0 ? "+" : ""}${money(p)}`);
+                      try {
+                        const res = await close.mutateAsync({ tradeId: t.id });
+                        toast.success(
+                          `Closed ${res.symbol} for ${res.pnl >= 0 ? "+" : ""}${money(res.pnl)}`,
+                        );
+                      } catch (err) {
+                        toast.error(err instanceof Error ? err.message : "Could not close that position.");
+                      }
                     }}
                   >
-                    Close position
+                    {close.isPending ? "Closing…" : "Close position"}
                   </Button>
                 </li>
               );
             })}
           </ul>
         )}
+        <div className="mt-2">
+          <ErrorBanner error={close.error} />
+        </div>
       </section>
 
       {closedTrades.length > 0 && (
@@ -225,9 +261,13 @@ export function PaperTrading() {
           </h3>
           <ul className="flex flex-col gap-2">
             {closedTrades.slice(0, 10).map((t) => (
-              <li key={t.id} className="flex items-center justify-between rounded-xl border border-border/50 bg-card px-3.5 py-2.5 text-xs">
+              <li
+                key={t.id}
+                className="flex items-center justify-between rounded-xl border border-border/50 bg-card px-3.5 py-2.5 text-xs"
+              >
                 <span>
-                  <span className="font-bold">{t.symbol}</span> <span className="capitalize text-muted-foreground">{t.side}</span>{" "}
+                  <span className="font-bold">{t.symbol}</span>{" "}
+                  <span className="capitalize text-muted-foreground">{t.side}</span>{" "}
                   {Number(t.entry_price).toFixed(2)} → {Number(t.exit_price ?? 0).toFixed(2)}
                 </span>
                 <span className={`font-bold ${Number(t.pnl) >= 0 ? "text-success" : "text-destructive"}`}>
@@ -257,7 +297,13 @@ function Field({
   return (
     <div className="space-y-1">
       <Label className="text-[11px] text-muted-foreground">{label}</Label>
-      <Input inputMode="decimal" value={value} placeholder={placeholder} onChange={(e) => onChange(e.target.value)} className="h-10" />
+      <Input
+        inputMode="decimal"
+        value={value}
+        placeholder={placeholder}
+        onChange={(e) => onChange(e.target.value)}
+        className="h-10"
+      />
     </div>
   );
 }
