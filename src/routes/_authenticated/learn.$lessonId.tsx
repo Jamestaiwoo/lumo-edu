@@ -5,8 +5,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Disclaimer } from "@/components/Disclaimer";
 import { getLesson, worldOfLesson, type Question } from "@/content/curriculum";
-import { useCompleteLesson, type LessonResult } from "@/lib/api";
-import { ACHIEVEMENT_MAP } from "@/lib/api";
+import { useCompleteLesson, ACHIEVEMENT_MAP } from "@/lib/api";
+import type { SubmittedAnswer } from "@/lib/progress.functions";
+import { ErrorBanner } from "@/components/state/StateViews";
 
 export const Route = createFileRoute("/_authenticated/learn/$lessonId")({
   head: () => ({
