@@ -5,8 +5,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Disclaimer } from "@/components/Disclaimer";
 import { getLesson, worldOfLesson, type Question } from "@/content/curriculum";
-import { useCompleteLesson, type LessonResult } from "@/lib/api";
-import { ACHIEVEMENT_MAP } from "@/lib/api";
+import { useCompleteLesson, ACHIEVEMENT_MAP } from "@/lib/api";
+import type { SubmittedAnswer } from "@/lib/progress.functions";
+import { ErrorBanner } from "@/components/state/StateViews";
 
 export const Route = createFileRoute("/_authenticated/learn/$lessonId")({
   head: () => ({
@@ -33,12 +34,13 @@ function LessonPage() {
   const [choice, setChoice] = useState<number | null>(null);
   const [text, setText] = useState("");
   const [checked, setChecked] = useState(false);
-  const [results, setResults] = useState<LessonResult[]>([]);
+  const [answers, setAnswers] = useState<SubmittedAnswer[]>([]);
   const [summary, setSummary] = useState<{
     correct: number;
     total: number;
     gained: number;
     streak: number;
+    alreadyRewarded: boolean;
     newAchievements: string[];
   } | null>(null);
 
@@ -66,8 +68,9 @@ function LessonPage() {
       setChecked(true);
       return;
     }
-    const nextResults = [...results, { questionId: question!.id, topic: question!.topic, correct: isCorrect }];
-    setResults(nextResults);
+    const raw = question!.type === "numeric" ? text : String(choice ?? "");
+    const nextAnswers = [...answers, { questionId: question!.id, raw }];
+    setAnswers(nextAnswers);
     setChecked(false);
     setChoice(null);
     setText("");
@@ -76,8 +79,12 @@ function LessonPage() {
       setIndex(index + 1);
       return;
     }
-    const res = await complete.mutateAsync({ lesson: lesson!, worldId: world!.id, results: nextResults });
-    setSummary(res);
+    try {
+      const res = await complete.mutateAsync({ lessonId: lesson!.id, answers: nextAnswers });
+      setSummary(res);
+    } catch {
+      /* surfaced by the inline error banner below */
+    }
   }
 
   if (summary) {
@@ -101,7 +108,13 @@ function LessonPage() {
               {summary.streak} day streak
             </span>
           </div>
+          {summary.alreadyRewarded && (
+            <p className="mt-3 text-[11px] text-muted-foreground">
+              You'd already earned the XP for this lesson — this run counts as practice and your best score is kept.
+            </p>
+          )}
         </div>
+
 
         {summary.newAchievements.length > 0 && (
           <div className="rounded-2xl border border-border/60 bg-card p-4">
@@ -198,6 +211,11 @@ function LessonPage() {
               {isCorrect ? "Correct" : "Not quite"}
             </p>
             <p className="mt-1.5 text-xs leading-relaxed text-foreground/90">{question.explain}</p>
+          </div>
+        )}
+        {complete.isError && (
+          <div className="mb-3">
+            <ErrorBanner error={complete.error} />
           </div>
         )}
         <Button

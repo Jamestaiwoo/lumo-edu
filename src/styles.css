@@ -60,36 +60,36 @@
   --card-foreground: oklch(0.97 0.006 250);
   --popover: oklch(0.213 0.026 252);
   --popover-foreground: oklch(0.97 0.006 250);
-  --primary: oklch(0.82 0.16 172);
-  --primary-foreground: oklch(0.19 0.04 190);
+  --primary: oklch(0.87 0.23 132);
+  --primary-foreground: oklch(0.19 0.06 140);
   --secondary: oklch(0.27 0.03 254);
   --secondary-foreground: oklch(0.96 0.006 250);
   --muted: oklch(0.26 0.026 254);
   --muted-foreground: oklch(0.7 0.024 254);
-  --accent: oklch(0.75 0.16 62);
-  --accent-foreground: oklch(0.2 0.04 62);
+  --accent: oklch(0.8 0.15 72);
+  --accent-foreground: oklch(0.2 0.04 72);
   --destructive: oklch(0.65 0.2 22);
   --destructive-foreground: oklch(0.98 0.005 250);
-  --success: oklch(0.78 0.17 155);
-  --success-foreground: oklch(0.2 0.05 155);
+  --success: oklch(0.76 0.14 168);
+  --success-foreground: oklch(0.2 0.05 168);
   --warning: oklch(0.82 0.15 85);
   --warning-foreground: oklch(0.22 0.05 85);
   --border: oklch(0.3 0.03 254);
   --input: oklch(0.3 0.03 254);
-  --ring: oklch(0.82 0.16 172);
-  --chart-1: oklch(0.82 0.16 172);
-  --chart-2: oklch(0.75 0.16 62);
+  --ring: oklch(0.87 0.23 132);
+  --chart-1: oklch(0.87 0.23 132);
+  --chart-2: oklch(0.8 0.15 72);
   --chart-3: oklch(0.7 0.16 300);
-  --chart-4: oklch(0.78 0.17 155);
+  --chart-4: oklch(0.76 0.14 168);
   --chart-5: oklch(0.65 0.2 22);
   --sidebar: oklch(0.213 0.026 252);
   --sidebar-foreground: oklch(0.97 0.006 250);
-  --sidebar-primary: oklch(0.82 0.16 172);
-  --sidebar-primary-foreground: oklch(0.19 0.04 190);
+  --sidebar-primary: oklch(0.87 0.23 132);
+  --sidebar-primary-foreground: oklch(0.19 0.06 140);
   --sidebar-accent: oklch(0.27 0.03 254);
   --sidebar-accent-foreground: oklch(0.96 0.006 250);
   --sidebar-border: oklch(0.3 0.03 254);
-  --sidebar-ring: oklch(0.82 0.16 172);
+  --sidebar-ring: oklch(0.87 0.23 132);
 }
 
 @layer base {
@@ -118,7 +118,7 @@
 }
 
 @utility glow-primary {
-  box-shadow: 0 0 0 1px oklch(0.82 0.16 172 / 0.25), 0 12px 40px -18px oklch(0.82 0.16 172 / 0.65);
+  box-shadow: 0 0 0 1px oklch(0.87 0.23 132 / 0.28), 0 12px 44px -18px oklch(0.87 0.23 132 / 0.7);
 }
 
 @utility surface {
