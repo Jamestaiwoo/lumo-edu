@@ -108,7 +108,13 @@ function LessonPage() {
               {summary.streak} day streak
             </span>
           </div>
+          {summary.alreadyRewarded && (
+            <p className="mt-3 text-[11px] text-muted-foreground">
+              You'd already earned the XP for this lesson — this run counts as practice and your best score is kept.
+            </p>
+          )}
         </div>
+
 
         {summary.newAchievements.length > 0 && (
           <div className="rounded-2xl border border-border/60 bg-card p-4">
@@ -205,6 +211,11 @@ function LessonPage() {
               {isCorrect ? "Correct" : "Not quite"}
             </p>
             <p className="mt-1.5 text-xs leading-relaxed text-foreground/90">{question.explain}</p>
+          </div>
+        )}
+        {complete.isError && (
+          <div className="mb-3">
+            <ErrorBanner error={complete.error} />
           </div>
         )}
         <Button
