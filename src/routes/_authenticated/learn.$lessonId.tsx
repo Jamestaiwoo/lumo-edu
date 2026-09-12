@@ -34,12 +34,13 @@ function LessonPage() {
   const [choice, setChoice] = useState<number | null>(null);
   const [text, setText] = useState("");
   const [checked, setChecked] = useState(false);
-  const [results, setResults] = useState<LessonResult[]>([]);
+  const [answers, setAnswers] = useState<SubmittedAnswer[]>([]);
   const [summary, setSummary] = useState<{
     correct: number;
     total: number;
     gained: number;
     streak: number;
+    alreadyRewarded: boolean;
     newAchievements: string[];
   } | null>(null);
 
