@@ -8,6 +8,7 @@ import { useAchievements, useProfile, useProgress, useTopicStats } from "@/lib/a
 import { ACHIEVEMENTS, ALL_LESSONS, TOPIC_LABELS, WORLDS } from "@/content/curriculum";
 import { levelFromXp, money, todayISO } from "@/lib/game";
 import { supabase } from "@/integrations/supabase/client";
+import { ErrorBanner, ErrorState, LoadingState } from "@/components/state/StateViews";
 
 export const Route = createFileRoute("/_authenticated/home")({
   head: () => ({
@@ -41,9 +42,12 @@ function useTodayXp() {
 
 function HomePage() {
   const navigate = useNavigate();
-  const { data: profile, isLoading } = useProfile();
-  const { data: progress = [] } = useProgress();
-  const { data: earned = [] } = useAchievements();
+  const profileQuery = useProfile();
+  const profile = profileQuery.data;
+  const progressQuery = useProgress();
+  const progress = progressQuery.data ?? [];
+  const achievementsQuery = useAchievements();
+  const earned = achievementsQuery.data ?? [];
   const { data: topics = [] } = useTopicStats();
   const { data: todayXp = 0 } = useTodayXp();
 
@@ -51,10 +55,22 @@ function HomePage() {
     if (profile && !profile.onboarded) navigate({ to: "/onboarding", replace: true });
   }, [profile, navigate]);
 
-  if (isLoading || !profile) {
+  if (profileQuery.isError) {
     return (
       <AppShell title="Home">
-        <div className="h-40 animate-pulse rounded-2xl bg-secondary" />
+        <ErrorState
+          error={profileQuery.error}
+          title="We couldn't load your dashboard"
+          onRetry={() => profileQuery.refetch()}
+        />
+      </AppShell>
+    );
+  }
+
+  if (profileQuery.isPending || !profile) {
+    return (
+      <AppShell title="Home">
+        <LoadingState label="Loading your dashboard…" rows={4} />
       </AppShell>
     );
   }
