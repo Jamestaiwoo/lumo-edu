@@ -68,8 +68,9 @@ function LessonPage() {
       setChecked(true);
       return;
     }
-    const nextResults = [...results, { questionId: question!.id, topic: question!.topic, correct: isCorrect }];
-    setResults(nextResults);
+    const raw = question!.type === "numeric" ? text : String(choice ?? "");
+    const nextAnswers = [...answers, { questionId: question!.id, raw }];
+    setAnswers(nextAnswers);
     setChecked(false);
     setChoice(null);
     setText("");
@@ -78,8 +79,12 @@ function LessonPage() {
       setIndex(index + 1);
       return;
     }
-    const res = await complete.mutateAsync({ lesson: lesson!, worldId: world!.id, results: nextResults });
-    setSummary(res);
+    try {
+      const res = await complete.mutateAsync({ lessonId: lesson!.id, answers: nextAnswers });
+      setSummary(res);
+    } catch {
+      /* surfaced by the inline error banner below */
+    }
   }
 
   if (summary) {
