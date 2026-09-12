@@ -85,6 +85,8 @@ function HomePage() {
   return (
     <AppShell title={`Hi, ${profile.display_name}`} subtitle="Learn trading. One decision at a time.">
       <div className="flex flex-col gap-4">
+        {progressQuery.isError && <ErrorBanner error={progressQuery.error} />}
+        {achievementsQuery.isError && <ErrorBanner error={achievementsQuery.error} />}
         <section className="surface glow-primary rounded-3xl border border-primary/25 p-5">
           <div className="flex items-center justify-between">
             <div>

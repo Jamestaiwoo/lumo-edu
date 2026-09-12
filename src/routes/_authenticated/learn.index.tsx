@@ -3,6 +3,7 @@ import { Check, Lock, Play, Star } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { Disclaimer } from "@/components/Disclaimer";
 import { useProgress } from "@/lib/api";
+import { ErrorState, LoadingState } from "@/components/state/StateViews";
 import { LESSON_ORDER, WORLDS } from "@/content/curriculum";
 
 export const Route = createFileRoute("/_authenticated/learn/")({
