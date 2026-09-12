@@ -30,17 +30,32 @@ export const Route = createFileRoute("/_authenticated/profile")({
 function ProfilePage() {
   const navigate = useNavigate();
   const qc = useQueryClient();
-  const { data: profile } = useProfile();
+  const profileQuery = useProfile();
+  const profile = profileQuery.data;
   const { data: progress = [] } = useProgress();
-  const { data: earned = [] } = useAchievements();
+  const achievementsQuery = useAchievements();
+  const earned = achievementsQuery.data ?? [];
   const { data: topics = [] } = useTopicStats();
+  const account = usePaperAccount();
   const update = useUpdateProfile();
   const [name, setName] = useState("");
 
-  if (!profile) {
+  if (profileQuery.isError) {
     return (
       <AppShell title="Profile">
-        <div className="h-40 animate-pulse rounded-2xl bg-secondary" />
+        <ErrorState
+          error={profileQuery.error}
+          title="We couldn't load your profile"
+          onRetry={() => profileQuery.refetch()}
+        />
+      </AppShell>
+    );
+  }
+
+  if (profileQuery.isPending || !profile) {
+    return (
+      <AppShell title="Profile">
+        <LoadingState label="Loading your profile…" rows={4} />
       </AppShell>
     );
   }

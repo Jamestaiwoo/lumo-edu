@@ -21,7 +21,29 @@ export const Route = createFileRoute("/_authenticated/learn/")({
 });
 
 function LearnPath() {
-  const { data: progress = [] } = useProgress();
+  const progressQuery = useProgress();
+
+  if (progressQuery.isPending) {
+    return (
+      <AppShell title="Learning path" subtitle="Finish a lesson to unlock the next">
+        <LoadingState label="Loading your path…" rows={5} />
+      </AppShell>
+    );
+  }
+
+  if (progressQuery.isError) {
+    return (
+      <AppShell title="Learning path" subtitle="Finish a lesson to unlock the next">
+        <ErrorState
+          error={progressQuery.error}
+          title="We couldn't load your path"
+          onRetry={() => progressQuery.refetch()}
+        />
+      </AppShell>
+    );
+  }
+
+  const progress = progressQuery.data ?? [];
   const doneMap = new Map(progress.filter((p) => p.completed).map((p) => [p.lesson_id, p]));
 
   const firstIncomplete = LESSON_ORDER.find((id) => !doneMap.has(id));
