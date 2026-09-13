@@ -9,7 +9,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { useAchievements, useProfile, useProgress, useTopicStats, useUpdateProfile } from "@/lib/api";
+import { useAchievements, usePaperAccount, useProfile, useProgress, useTopicStats, useUpdateProfile } from "@/lib/api";
+import { ErrorBanner, ErrorState, LoadingState } from "@/components/state/StateViews";
 import { ACHIEVEMENTS, ALL_LESSONS, TOPIC_LABELS } from "@/content/curriculum";
 import { levelFromXp, money } from "@/lib/game";
 
