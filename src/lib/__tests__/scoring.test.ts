@@ -82,7 +82,8 @@ describe("opening a simulated trade", () => {
 
   it("caps risk at 5% and requires a stop", () => {
     expect(validateOpen({ ...base, riskPct: 6 }).ok).toBe(false);
-    expect(validateOpen({ ...base, riskPct: 5 }).ok).toBe(true);
+    // 5% is allowed when the position still fits the buying power
+    expect(validateOpen({ ...base, riskPct: 5, stopLoss: 40 }).ok).toBe(true);
     expect(validateOpen({ ...base, stopLoss: 0 }).ok).toBe(false);
   });
 
