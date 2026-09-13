@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { askCoach } from "@/lib/coach.functions";
 import { useProfile, useTopicStats } from "@/lib/api";
 import { TOPIC_LABELS } from "@/content/curriculum";
+import { ErrorBanner } from "@/components/state/StateViews";
 
 export const Route = createFileRoute("/_authenticated/coach")({
   head: () => ({
@@ -48,6 +49,7 @@ function CoachPage() {
   ]);
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<unknown>(null);
 
   async function send(text: string) {
     const content = text.trim();
@@ -56,6 +58,7 @@ function CoachPage() {
     setMessages(next);
     setInput("");
     setBusy(true);
+    setError(null);
     try {
       const weak = topics
         .filter((t) => t.accuracy < 0.75)
@@ -67,7 +70,8 @@ function CoachPage() {
       }`;
       const res = await call({ data: { messages: next, context } });
       setMessages([...next, { role: "assistant", content: res.reply }]);
-    } catch {
+    } catch (err) {
+      setError(err);
       setMessages([
         ...next,
         { role: "assistant", content: "I couldn't reach the coach just now. Try again in a moment." },
@@ -116,6 +120,8 @@ function CoachPage() {
             ))}
           </div>
         )}
+
+        <ErrorBanner error={error} />
 
         <form
           className="sticky bottom-20 flex gap-2 rounded-2xl border border-border/60 bg-card p-2"
