@@ -9,7 +9,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { useAchievements, useProfile, useProgress, useTopicStats, useUpdateProfile } from "@/lib/api";
+import { useAchievements, usePaperAccount, useProfile, useProgress, useTopicStats, useUpdateProfile } from "@/lib/api";
+import { ErrorBanner, ErrorState, LoadingState } from "@/components/state/StateViews";
 import { ACHIEVEMENTS, ALL_LESSONS, TOPIC_LABELS } from "@/content/curriculum";
 import { levelFromXp, money } from "@/lib/game";
 
@@ -103,6 +104,11 @@ function ProfilePage() {
           <p className="flex items-center gap-2 text-sm font-bold">
             <Award className="size-4 text-accent" aria-hidden /> Achievements
           </p>
+          {achievementsQuery.isError && (
+            <div className="mt-2">
+              <ErrorBanner error={achievementsQuery.error} />
+            </div>
+          )}
           <ul className="mt-3 grid grid-cols-2 gap-2">
             {ACHIEVEMENTS.map((a) => {
               const has = earnedCodes.has(a.code);
@@ -147,8 +153,21 @@ function ProfilePage() {
         <section className="rounded-2xl border border-border/60 bg-card p-4">
           <p className="text-sm font-bold">Account</p>
           <p className="mt-1 text-xs text-muted-foreground">
-            Simulated balance: <span className="font-semibold text-foreground">{money(Number(profile.cash_balance))}</span>
+            Simulated balance:{" "}
+            <span className="font-semibold text-foreground">
+              {account.isPending
+                ? "…"
+                : money(Number(account.data?.current_balance ?? profile.cash_balance))}
+            </span>
           </p>
+          <p className="mt-1 text-[11px] font-bold uppercase tracking-wide text-warning">
+            SIMULATED TRADING — NO REAL MONEY
+          </p>
+          {account.isError && (
+            <div className="mt-2">
+              <ErrorBanner error={account.error} />
+            </div>
+          )}
           <div className="mt-3 space-y-1.5">
             <Label className="text-xs text-muted-foreground">Change display name</Label>
             <div className="flex gap-2">
