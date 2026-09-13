@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ALL_LESSONS, TOPIC_LABELS, type Question } from "@/content/curriculum";
 import { useTopicStats } from "@/lib/api";
+import { EmptyState, ErrorState, LoadingState } from "@/components/state/StateViews";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -36,8 +37,19 @@ export function WeakDrill() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [seed, topics.length]);
 
+  if (topicsQuery.isPending) return <LoadingState label="Building your drill…" rows={3} />;
+  if (topicsQuery.isError)
+    return (
+      <ErrorState
+        error={topicsQuery.error}
+        title="We couldn't build your drill"
+        onRetry={() => topicsQuery.refetch()}
+      />
+    );
+
   const q = set[i];
-  if (!q) return null;
+  if (!q)
+    return <EmptyState title="No questions available" description="Finish a lesson first, then come back to drill." />;
   const correct = evaluate(q, choice, text);
 
   async function next() {
