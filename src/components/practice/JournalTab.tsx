@@ -5,11 +5,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useAddJournal, useJournal, useTrades } from "@/lib/api";
+import { EmptyState, ErrorBanner, ErrorState, LoadingState } from "@/components/state/StateViews";
 
 const MOODS = ["calm", "confident", "anxious", "impatient", "frustrated"];
 
 export function JournalTab() {
-  const { data: entries = [] } = useJournal();
+  const journal = useJournal();
+  const entries = journal.data ?? [];
   const { data: trades = [] } = useTrades();
   const add = useAddJournal();
 
