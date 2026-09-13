@@ -15,7 +15,9 @@ function evaluate(q: Question, choice: number | null, text: string) {
 }
 
 export function WeakDrill() {
-  const { data: topics = [], refetch } = useTopicStats();
+  const topicsQuery = useTopicStats();
+  const topics = topicsQuery.data ?? [];
+  const refetch = topicsQuery.refetch;
   const [seed, setSeed] = useState(0);
   const [i, setI] = useState(0);
   const [choice, setChoice] = useState<number | null>(null);

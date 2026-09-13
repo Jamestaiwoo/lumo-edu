@@ -91,6 +91,7 @@ export function JournalTab() {
               </select>
             </div>
           )}
+          <ErrorBanner error={add.error} />
           <Button className="h-11 font-bold" onClick={save} disabled={add.isPending}>
             {add.isPending ? "Saving…" : "Save entry"}
           </Button>
@@ -99,10 +100,19 @@ export function JournalTab() {
 
       <section>
         <h3 className="mb-2 text-sm font-bold">Your journal</h3>
-        {entries.length === 0 ? (
-          <p className="rounded-2xl border border-dashed border-border p-4 text-xs text-muted-foreground">
-            Nothing yet. Writing down the decision is how you separate a good process from a good outcome.
-          </p>
+        {journal.isPending ? (
+          <LoadingState label="Loading your journal…" rows={2} />
+        ) : journal.isError ? (
+          <ErrorState
+            error={journal.error}
+            title="We couldn't load your journal"
+            onRetry={() => journal.refetch()}
+          />
+        ) : entries.length === 0 ? (
+          <EmptyState
+            title="Nothing yet"
+            description="Writing down the decision is how you separate a good process from a good outcome."
+          />
         ) : (
           <ul className="flex flex-col gap-2">
             {entries.map((e) => (
