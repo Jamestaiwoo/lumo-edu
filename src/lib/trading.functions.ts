@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { INSTRUMENTS, priceAt } from "./market";
-import { MAX_OPEN_POSITIONS, pnlFor, validateClose, validateOpen, type TradeSide } from "./scoring";
+import { INSTRUMENTS, getLivePrice, getPriceWithFallback, pnlFor } from "./market";
+import { MAX_OPEN_POSITIONS, validateClose, validateOpen, type TradeSide } from "./scoring";
 
 export type PaperAccount = {
   user_id: string;
@@ -45,6 +45,23 @@ export const getPaperAccount = createServerFn({ method: "POST" })
     ensureAccount(context.supabase as never, context.userId),
   );
 
+/**
+ * Get current live price for a symbol
+ * Server-side function ensures API key stays secure
+ */
+export const getMarketPrice = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: { symbol: string }) => ({ symbol: String(input.symbol) }))
+  .handler(async ({ data }) => {
+    const price = await getLivePrice(data.symbol);
+    if (price <= 0) {
+      // Fallback to simulated if API fails
+      const fallbackPrice = await getPriceWithFallback(data.symbol);
+      return { symbol: data.symbol, price: fallbackPrice, live: false, fallback: true };
+    }
+    return { symbol: data.symbol, price, live: true, fallback: false };
+  });
+
 export const openTrade = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: { symbol: string; side: TradeSide; riskPct: number; stopLoss: number; takeProfit: number | null }) => ({
@@ -58,7 +75,11 @@ export const openTrade = createServerFn({ method: "POST" })
     const { supabase, userId } = context;
 
     if (!INSTRUMENTS.some((i) => i.symbol === data.symbol)) throw new Error("Unknown instrument.");
-    const price = priceAt(data.symbol);
+    
+    // Fetch live price from Alpha Vantage
+    const price = await getLivePrice(data.symbol);
+    if (price <= 0) throw new Error("Price unavailable. Try again in a moment.");
+    
     const account = await ensureAccount(supabase as never, userId);
 
     const { count, error: countErr } = await supabase
@@ -134,7 +155,10 @@ export const closeTrade = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     if (!trade) throw new Error("That position no longer exists.");
 
-    const exitPrice = priceAt(trade.symbol);
+    // Fetch live exit price
+    const exitPrice = await getLivePrice(trade.symbol);
+    if (exitPrice <= 0) throw new Error("Price unavailable. Try again in a moment.");
+    
     const check = validateClose({ exitPrice, status: trade.status });
     if (!check.ok) throw new Error(check.error);
 
