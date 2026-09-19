@@ -1,8 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
-import { ACHIEVEMENTS, TOPIC_LABELS } from "@/content/curriculum";
-import { calculateMastery, recommendTopic, type TopicMasteryRecord } from "./mastery";
+import { ACHIEVEMENTS } from "@/content/curriculum";
+import { calculateMastery, type TopicMasteryRecord } from "./mastery";
 import { completeLesson, type CompleteLessonResult, type SubmittedAnswer } from "./progress.functions";
 import { closeTrade, getPaperAccount, openTrade } from "./trading.functions";
 
@@ -169,16 +169,11 @@ export function useTopicStats() {
         ...calculateMastery(value),
       }));
 
-      const recommended = recommendTopic(stats);
       return stats.sort((a, b) =>
         b.reviewPriorityScore - a.reviewPriorityScore ||
         a.accuracy - b.accuracy ||
         a.topic.localeCompare(b.topic),
-      ).map((item) => ({
-        ...item,
-        topicLabel: TOPIC_LABELS[item.topic] ?? item.topic,
-        isRecommended: recommended?.topic === item.topic,
-      })) as TopicMasteryRecord[];
+      );
     },
   });
 }mport { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
