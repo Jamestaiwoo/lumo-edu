@@ -43,19 +43,20 @@ export const completeLesson = createServerFn({ method: "POST" })
     const world = worldOfLesson(data.lessonId);
     if (!lesson || !world) throw new Error("That lesson doesn't exist.");
 
-    // Enforce the learning path on the server as well as in the UI.
+    // Enforce the same sequential learning path on the server as in the UI.
     // A client must never be able to submit a locked lesson by calling this function directly.
-    const lessonIndex = LESSON_ORDER.indexOf(lesson.id);
-    if (lessonIndex > 0) {
-      const previousLessonId = LESSON_ORDER[lessonIndex - 1];
-      const { data: previousProgress, error: previousProgressErr } = await supabase
-        .from("lesson_progress")
-        .select("completed")
-        .eq("user_id", userId)
-        .eq("lesson_id", previousLessonId)
-        .maybeSingle();
-      if (previousProgressErr) throw new Error(previousProgressErr.message);
-      if (!previousProgress?.completed) throw new Error("Finish the previous lesson first.");
+    const { data: progressRows, error: progressErr } = await supabase
+      .from("lesson_progress")
+      .select("lesson_id, completed")
+      .eq("user_id", userId);
+    if (progressErr) throw new Error(progressErr.message);
+
+    const completedLessonIds = (progressRows ?? [])
+      .filter((row) => row.completed)
+      .map((row) => row.lesson_id as string);
+
+    if (!isLessonUnlocked(lesson.id, completedLessonIds)) {
+      throw new Error("Finish the previous lesson first.");
     }
 
     // ---- grade on the server
