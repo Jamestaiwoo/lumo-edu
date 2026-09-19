@@ -112,3 +112,28 @@ describe("lesson-aware recommendations", () => {
     expect(getRecommendedLesson("unknown-topic", 99)).toBeUndefined();
   });
 });
+
+
+describe("lesson unlock rules", () => {
+  it("unlocks only the first lesson for a new learner", () => {
+    expect(getUnlockedLessonIndex([])).toBe(0);
+    expect(isLessonUnlocked("w1l1", [])).toBe(true);
+    expect(isLessonUnlocked("w1l2", [])).toBe(false);
+  });
+
+  it("unlocks the next lesson after completing the previous one", () => {
+    expect(getUnlockedLessonIndex(["w1l1"])).toBe(1);
+    expect(isLessonUnlocked("w1l2", ["w1l1"])).toBe(true);
+    expect(isLessonUnlocked("w1l3", ["w1l1"])).toBe(false);
+  });
+
+  it("allows all lessons after the path is complete", () => {
+    const completed = [
+      "w1l1","w1l2","w1l3","w1l4",
+      "w2l1","w2l2","w2l3","w2l4",
+      "w3l1","w3l2","w3l3","w3l4",
+    ];
+    expect(getUnlockedLessonIndex(completed)).toBe(11);
+    expect(isLessonUnlocked("w3l4", completed)).toBe(true);
+  });
+});
