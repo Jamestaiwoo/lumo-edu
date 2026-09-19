@@ -21,7 +21,7 @@ function grade(question: Question, raw: string): boolean {
   const value = (raw ?? "").trim();
   if (question.type === "mcq") return Number(value) === question.answer;
   if (question.type === "truefalse") return (Number(value) === 0) === question.answer;
-  const num = Number(value.replace(/[^0-9.\-]/g, ""));
+  const num = Number(value.replace(/[^0-9.-]/g, ""));
   if (!Number.isFinite(num)) return false;
   return Math.abs(num - question.answer) <= (question.tolerance ?? 0.01);
 }
