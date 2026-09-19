@@ -4,7 +4,8 @@ import { AppShell } from "@/components/AppShell";
 import { Disclaimer } from "@/components/Disclaimer";
 import { useProgress, useTopicStats } from "@/lib/api";
 import { ErrorState, LoadingState } from "@/components/state/StateViews";
-import { ALL_LESSONS, LESSON_ORDER, TOPIC_LABELS, WORLDS } from "@/content/curriculum";
+import { LESSON_ORDER, TOPIC_LABELS, WORLDS } from "@/content/curriculum";
+import { getLessonForTopic, getRecommendedLesson } from "@/lib/recommendation";
 
 export const Route = createFileRoute("/_authenticated/learn/")({
   head: () => ({
@@ -50,11 +51,10 @@ function LearnPath() {
   const firstIncomplete = LESSON_ORDER.find((id) => !doneMap.has(id));
   const unlockedIndex = firstIncomplete ? LESSON_ORDER.indexOf(firstIncomplete) : LESSON_ORDER.length - 1;
   const recommended = topicStatsQuery.data?.[0];
-  const recommendedLesson = recommended
-    ? ALL_LESSONS.find((lesson) => lesson.questions.some((question) => question.topic === recommended.topic))
+  const recommendedLesson = recommended ? getLessonForTopic(recommended.topic) : undefined;
+  const unlockedRecommendedLesson = recommended
+    ? getRecommendedLesson(recommended.topic, unlockedIndex)
     : undefined;
-  const recommendedLessonIndex = recommendedLesson ? LESSON_ORDER.indexOf(recommendedLesson.id) : -1;
-  const recommendedLessonLocked = recommendedLessonIndex > unlockedIndex;
 
   return (
     <AppShell title="Learning path" subtitle="Finish a lesson to unlock the next">
@@ -69,8 +69,8 @@ function LearnPath() {
                   {Math.round(recommended.accuracy * 100)}% accuracy · {recommended.reviewPriority} priority
                 </p>
               </div>
-              {recommendedLesson && !recommendedLessonLocked ? (
-                <Link to="/learn/$lessonId" params={{ lessonId: recommendedLesson.id }} className="shrink-0 rounded-xl bg-primary px-3 py-2 text-xs font-bold text-primary-foreground">
+              {recommendedLesson && unlockedRecommendedLesson ? (
+                <Link to="/learn/$lessonId" params={{ lessonId: unlockedRecommendedLesson.id }} className="shrink-0 rounded-xl bg-primary px-3 py-2 text-xs font-bold text-primary-foreground">
                   Review
                 </Link>
               ) : (
