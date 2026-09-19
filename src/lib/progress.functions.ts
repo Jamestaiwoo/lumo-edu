@@ -147,11 +147,11 @@ export const completeLesson = createServerFn({ method: "POST" })
     }
 
     // ---- achievements, decided on the server
-    const { data: progressRows } = await supabase
+    const { data: achievementProgressRows } = await supabase
       .from("lesson_progress")
       .select("lesson_id, completed")
       .eq("user_id", userId);
-    const done = (progressRows ?? []) as { lesson_id: string; completed: boolean }[];
+    const done = (achievementProgressRows ?? []) as { lesson_id: string; completed: boolean }[];
 
     const candidates: string[] = [];
     if (done.some((d) => d.completed)) candidates.push("first_lesson");
