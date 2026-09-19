@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { calculateMastery, getMasteryStatus, getReviewPriority, recommendTopic } from "../mastery";
+import { calculateMastery, getMasteryStatus, getReviewPriority, rankTopicsForReview, recommendTopic } from "../mastery";
 
 describe("getMasteryStatus", () => {
   it("uses the documented accuracy thresholds", () => {
@@ -66,12 +66,28 @@ describe("getReviewPriority", () => {
   });
 });
 
-describe("recommendTopic", () => {
-  it("selects the highest-priority topic deterministically", () => {
-    const result = recommendTopic([
-      { topic: "strong-topic", ...calculateMastery({ attempts: 10, correct: 9 }) },
-      { topic: "weak-topic", ...calculateMastery({ attempts: 10, correct: 4 }) },
+describe("topic recommendation", () => {
+  const stats = [
+    { topic: "strong-topic", ...calculateMastery({ attempts: 10, correct: 9 }) },
+    { topic: "weak-topic", ...calculateMastery({ attempts: 10, correct: 4 }) },
+    { topic: "developing-topic", ...calculateMastery({ attempts: 10, correct: 6 }) },
+  ];
+
+  it("ranks topics using one deterministic review ordering", () => {
+    expect(rankTopicsForReview(stats).map((topic) => topic.topic)).toEqual([
+      "weak-topic",
+      "developing-topic",
+      "strong-topic",
     ]);
-    expect(result?.topic).toBe("weak-topic");
+  });
+
+  it("uses the same ordering for the single recommended topic", () => {
+    expect(recommendTopic(stats)?.topic).toBe(rankTopicsForReview(stats)[0]?.topic);
+  });
+
+  it("does not mutate the source array", () => {
+    const original = [...stats];
+    rankTopicsForReview(stats);
+    expect(stats).toEqual(original);
   });
 });
