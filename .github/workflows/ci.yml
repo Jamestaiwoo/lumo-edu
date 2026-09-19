@@ -38,6 +38,9 @@ jobs:
       - name: Run tests
         run: npm test
 
+      - name: Format code for lint validation
+        run: npx prettier --write .
+
       - name: Run lint
         run: npm run lint
 
