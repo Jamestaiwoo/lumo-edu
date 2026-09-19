@@ -271,7 +271,7 @@ function OptionButton({
 function evaluate(q: Question, choice: number | null, text: string) {
   if (q.type === "mcq") return choice === q.answer;
   if (q.type === "truefalse") return (choice === 0) === q.answer;
-  const val = Number(text.replace(/[^0-9.\-]/g, ""));
+  const val = Number(text.replace(/[^0-9.-]/g, ""));
   if (Number.isNaN(val)) return false;
   return Math.abs(val - q.answer) <= (q.tolerance ?? 0.01);
 }
