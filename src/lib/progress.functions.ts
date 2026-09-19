@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { LESSON_ORDER, WORLDS, getLesson, worldOfLesson, type Question } from "@/content/curriculum";
+import { WORLDS, getLesson, worldOfLesson, type Question } from "@/content/curriculum";
 import { isLessonUnlocked } from "./recommendation";
 import { advanceStreak, isoDate, lessonXp, levelForXp } from "./scoring";
 
