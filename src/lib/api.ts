@@ -184,12 +184,14 @@ export function useCompleteLesson() {
   return useMutation({
     mutationFn: async (input: { lessonId: string; answers: SubmittedAnswer[] }): Promise<CompleteLessonResult> =>
       submit({ data: input }),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["profile"] });
-      qc.invalidateQueries({ queryKey: ["progress"] });
-      qc.invalidateQueries({ queryKey: ["achievements"] });
-      qc.invalidateQueries({ queryKey: ["topic-stats"] });
-      qc.invalidateQueries({ queryKey: ["today-xp"] });
+    onSuccess: async () => {
+      await Promise.all([
+        qc.invalidateQueries({ queryKey: ["profile"] }),
+        qc.invalidateQueries({ queryKey: ["progress"] }),
+        qc.invalidateQueries({ queryKey: ["achievements"] }),
+        qc.invalidateQueries({ queryKey: ["topic-stats"] }),
+        qc.invalidateQueries({ queryKey: ["today-xp"] }),
+      ]);
     },
   });
 }
