@@ -46,7 +46,7 @@ function LessonPage() {
 
   const question = lesson?.questions[index];
   const progressPct = useMemo(
-    () => (lesson ? (index / lesson.questions.length) * 100 : 0),
+    () => (lesson ? ((index + 1) / lesson.questions.length) * 100 : 0),
     [index, lesson],
   );
 
