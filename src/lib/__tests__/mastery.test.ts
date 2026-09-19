@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { calculateMastery, getMasteryStatus, getReviewPriority, rankTopicsForReview, recommendTopic } from "../mastery";
-import { getLessonForTopic, getRecommendedLesson } from "../recommendation";
+import { getLessonForTopic, getRecommendedLesson, getUnlockedLessonIndex, isLessonUnlocked } from "../recommendation";
 
 describe("getMasteryStatus", () => {
   it("uses the documented accuracy thresholds", () => {
