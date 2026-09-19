@@ -2,9 +2,9 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Check, Lock, Play, Star } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { Disclaimer } from "@/components/Disclaimer";
-import { useProgress } from "@/lib/api";
+import { useProgress, useTopicStats } from "@/lib/api";
 import { ErrorState, LoadingState } from "@/components/state/StateViews";
-import { LESSON_ORDER, WORLDS } from "@/content/curriculum";
+import { ALL_LESSONS, LESSON_ORDER, TOPIC_LABELS, WORLDS } from "@/content/curriculum";
 
 export const Route = createFileRoute("/_authenticated/learn/")({
   head: () => ({
@@ -22,6 +22,7 @@ export const Route = createFileRoute("/_authenticated/learn/")({
 
 function LearnPath() {
   const progressQuery = useProgress();
+  const topicStatsQuery = useTopicStats();
 
   if (progressQuery.isPending) {
     return (
@@ -48,10 +49,36 @@ function LearnPath() {
 
   const firstIncomplete = LESSON_ORDER.find((id) => !doneMap.has(id));
   const unlockedIndex = firstIncomplete ? LESSON_ORDER.indexOf(firstIncomplete) : LESSON_ORDER.length - 1;
+  const recommended = topicStatsQuery.data?.[0];
+  const recommendedLesson = recommended
+    ? ALL_LESSONS.find((lesson) => lesson.questions.some((question) => question.topic === recommended.topic))
+    : undefined;
+  const recommendedLessonIndex = recommendedLesson ? LESSON_ORDER.indexOf(recommendedLesson.id) : -1;
+  const recommendedLessonLocked = recommendedLessonIndex > unlockedIndex;
 
   return (
     <AppShell title="Learning path" subtitle="Finish a lesson to unlock the next">
       <div className="flex flex-col gap-8">
+        {recommended && (
+          <section className="rounded-2xl border border-primary/30 bg-primary/5 p-4">
+            <p className="text-[11px] font-semibold uppercase tracking-wide text-primary">Recommended review</p>
+            <div className="mt-1 flex items-center justify-between gap-3">
+              <div className="min-w-0">
+                <p className="truncate text-sm font-bold">{TOPIC_LABELS[recommended.topic] ?? recommended.topic}</p>
+                <p className="text-xs text-muted-foreground">
+                  {Math.round(recommended.accuracy * 100)}% accuracy · {recommended.reviewPriority} priority
+                </p>
+              </div>
+              {recommendedLesson && !recommendedLessonLocked ? (
+                <Link to="/learn/$lessonId" params={{ lessonId: recommendedLesson.id }} className="shrink-0 rounded-xl bg-primary px-3 py-2 text-xs font-bold text-primary-foreground">
+                  Review
+                </Link>
+              ) : (
+                <span className="shrink-0 text-[11px] font-semibold text-muted-foreground">Keep progressing</span>
+              )}
+            </div>
+          </section>
+        )}
         {WORLDS.map((world, wi) => (
           <section key={world.id}>
             <div className="mb-4 flex items-baseline justify-between">
