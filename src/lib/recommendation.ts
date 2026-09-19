@@ -13,3 +13,15 @@ export function getRecommendedLesson(topic: string, unlockedIndex: number): Less
 
   return lesson;
 }
+
+
+export function getUnlockedLessonIndex(completedLessonIds: string[]): number {
+  const firstIncompleteIndex = LESSON_ORDER.findIndex((id) => !completedLessonIds.includes(id));
+  return firstIncompleteIndex === -1 ? LESSON_ORDER.length - 1 : firstIncompleteIndex;
+}
+
+export function isLessonUnlocked(lessonId: string, completedLessonIds: string[]): boolean {
+  const lessonIndex = LESSON_ORDER.indexOf(lessonId);
+  if (lessonIndex < 0) return false;
+  return lessonIndex <= getUnlockedLessonIndex(completedLessonIds);
+}
