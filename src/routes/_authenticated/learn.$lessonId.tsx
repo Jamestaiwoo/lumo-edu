@@ -4,12 +4,12 @@ import { Check, ChevronLeft, Flame, Trophy, X, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Disclaimer } from "@/components/Disclaimer";
-import { getLesson, worldOfLesson, type Question } from "@/content/curriculum";
-import { useCompleteLesson, ACHIEVEMENT_MAP } from "@/lib/api";
+import { getLesson, worldOfLesson, LESSON_ORDER, type Question } from "@/content/curriculum";
+import { useCompleteLesson, ACHIEVEMENT_MAP, useTopicStats } from "@/lib/api";
 import type { SubmittedAnswer } from "@/lib/progress.functions";
 import { ErrorBanner, LoadingState } from "@/components/state/StateViews";
 import { useProgress } from "@/lib/api";
-import { isLessonUnlocked } from "@/lib/recommendation";
+import { getLessonForTopic, getRecommendedLesson, getUnlockedLessonIndex, isLessonUnlocked } from "@/lib/recommendation";
 
 export const Route = createFileRoute("/_authenticated/learn/$lessonId")({
   head: () => ({
@@ -32,6 +32,7 @@ function LessonPage() {
   const world = worldOfLesson(lessonId);
   const complete = useCompleteLesson();
   const progressQuery = useProgress();
+  const topicStatsQuery = useTopicStats();
 
   const [index, setIndex] = useState(0);
   const [choice, setChoice] = useState<number | null>(null);
@@ -49,7 +50,7 @@ function LessonPage() {
 
   const question = lesson?.questions[index];
   const progressPct = useMemo(
-    () => (lesson ? ((index + 1) / lesson.questions.length) * 100 : 0),
+    () => (lesson ? (index / lesson.questions.length) * 100 : 0),
     [index, lesson],
   );
 
@@ -155,6 +156,66 @@ function LessonPage() {
             </ul>
           </div>
         )}
+
+        {(() => {
+          const completedAfterLesson = new Set(completedLessonIds);
+          completedAfterLesson.add(lesson.id);
+          const unlockedAfterLesson = getUnlockedLessonIndex([...completedAfterLesson]);
+          const recommended = topicStatsQuery.data?.[0];
+          const recommendedLesson = recommended ? getLessonForTopic(recommended.topic) : undefined;
+          const unlockedRecommendedLesson = recommended
+            ? getRecommendedLesson(recommended.topic, unlockedAfterLesson)
+            : undefined;
+          const nextLessonId = LESSON_ORDER[unlockedAfterLesson];
+          const nextLessonIsAvailable =
+            Boolean(nextLessonId) && nextLessonId !== lesson.id && unlockedAfterLesson < LESSON_ORDER.length;
+
+          return (
+            <section className="rounded-2xl border border-primary/30 bg-primary/5 p-4">
+              <p className="text-[11px] font-semibold uppercase tracking-wide text-primary">
+                {recommended ? "Recommended review" : "Next step"}
+              </p>
+
+              {topicStatsQuery.isPending ? (
+                <p className="mt-1 text-xs text-muted-foreground">Updating your mastery…</p>
+              ) : recommended && recommendedLesson && unlockedRecommendedLesson ? (
+                <div className="mt-1 flex items-center justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-bold">
+                      {recommendedLesson.title}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {Math.round(recommended.accuracy * 100)}% accuracy · {recommended.reviewPriority} priority
+                    </p>
+                  </div>
+                  <Button
+                    className="shrink-0"
+                    onClick={() => navigate({ to: "/learn/$lessonId", params: { lessonId: unlockedRecommendedLesson.id } })}
+                  >
+                    Review
+                  </Button>
+                </div>
+              ) : nextLessonIsAvailable ? (
+                <div className="mt-1 flex items-center justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="text-sm font-bold">Keep building your path</p>
+                    <p className="text-xs text-muted-foreground">Your next lesson is ready.</p>
+                  </div>
+                  <Button
+                    className="shrink-0"
+                    onClick={() => navigate({ to: "/learn/$lessonId", params: { lessonId: nextLessonId } })}
+                  >
+                    Continue
+                  </Button>
+                </div>
+              ) : (
+                <p className="mt-1 text-xs text-muted-foreground">
+                  You’ve completed the learning path. Keep practicing to strengthen your mastery.
+                </p>
+              )}
+            </section>
+          );
+        })()}
 
         <div className="mt-auto flex flex-col gap-2">
           <Disclaimer />
