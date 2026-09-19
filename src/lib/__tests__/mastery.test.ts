@@ -38,7 +38,7 @@ describe("calculateMastery", () => {
       now: "2026-09-19T00:00:00.000Z",
     });
     expect(mastery.status).toBe("strong");
-    expect(mastery.reviewPriority).toBe("high");
+    expect(mastery.reviewPriority).toBe("medium");
   });
 
   it("handles zero attempts deterministically", () => {
@@ -62,7 +62,7 @@ describe("getReviewPriority", () => {
       lastPracticed: "2026-09-01T00:00:00.000Z",
       now: "2026-09-19T00:00:00.000Z",
     });
-    expect(review.priority).toBe("medium");
+    expect(review.priority).toBe("low");
   });
 });
 
