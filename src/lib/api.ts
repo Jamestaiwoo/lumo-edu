@@ -1,7 +1,191 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
-import { ACHIEVEMENTS } from "@/content/curriculum";
+import { ACHIEVEMENTS, TOPIC_LABELS } from "@/content/curriculum";
+import { calculateMastery, recommendTopic, type TopicMasteryRecord } from "./mastery";
+import { completeLesson, type CompleteLessonResult, type SubmittedAnswer } from "./progress.functions";
+import { closeTrade, getPaperAccount, openTrade } from "./trading.functions";
+
+export type Profile = {
+  id: string;
+  display_name: string;
+  experience_level: string;
+  goal: string;
+  daily_goal_xp: number;
+  onboarded: boolean;
+  xp: number;
+  level: number;
+  streak_count: number;
+  longest_streak: number;
+  last_active_date: string | null;
+  cash_balance: number;
+};
+
+export type LessonProgress = {
+  lesson_id: string;
+  world_id: string;
+  completed: boolean;
+  best_score: number;
+  total_questions: number;
+  attempts: number;
+};
+
+export type Trade = {
+  id: string;
+  symbol: string;
+  side: string;
+  quantity: number;
+  entry_price: number;
+  exit_price: number | null;
+  stop_loss: number | null;
+  take_profit: number | null;
+  status: string;
+  pnl: number | null;
+  risk_amount: number | null;
+  notes: string | null;
+  opened_at: string;
+  closed_at: string | null;
+};
+
+export type JournalEntry = {
+  id: string;
+  trade_id: string | null;
+  title: string;
+  notes: string;
+  mood: string;
+  lesson_learned: string;
+  created_at: string;
+};
+
+async function requireUserId() {
+  const { data, error } = await supabase.auth.getUser();
+  if (error || !data.user) throw new Error("Your session expired. Please sign in again.");
+  return data.user.id;
+}
+
+export function useProfile() {
+  return useQuery({
+    queryKey: ["profile"],
+    queryFn: async (): Promise<Profile> => {
+      const uid = await requireUserId();
+      const { data, error } = await supabase.from("profiles").select("*").eq("id", uid).maybeSingle();
+      if (error) throw error;
+      if (!data) {
+        const { data: created, error: insErr } = await supabase
+          .from("profiles")
+          .insert({ id: uid })
+          .select("*")
+          .single();
+        if (insErr) throw insErr;
+        return created as unknown as Profile;
+      }
+      return data as unknown as Profile;
+    },
+  });
+}
+
+export function useUpdateProfile() {
+  const qc = useQueryClient();
+  return useMutation({
+    // Only cosmetic / preference fields — XP, level, streak and balance are
+    // server-owned and are never written from the browser.
+    mutationFn: async (patch: Partial<Pick<Profile, "display_name" | "experience_level" | "goal" | "daily_goal_xp" | "onboarded">>) => {
+      const uid = await requireUserId();
+      const { error } = await supabase.from("profiles").update(patch).eq("id", uid);
+      if (error) throw error;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["profile"] }),
+  });
+}
+
+export function useProgress() {
+  return useQuery({
+    queryKey: ["progress"],
+    queryFn: async (): Promise<LessonProgress[]> => {
+      const uid = await requireUserId();
+      const { data, error } = await supabase.from("lesson_progress").select("*").eq("user_id", uid);
+      if (error) throw error;
+      return (data ?? []) as unknown as LessonProgress[];
+    },
+  });
+}
+
+export function useAchievements() {
+  return useQuery({
+    queryKey: ["achievements"],
+    queryFn: async (): Promise<{ code: string; earned_at: string }[]> => {
+      const uid = await requireUserId();
+      const { data, error } = await supabase
+        .from("achievements")
+        .select("code, earned_at")
+        .eq("user_id", uid);
+      if (error) throw error;
+      return (data ?? []) as { code: string; earned_at: string }[];
+    },
+  });
+}
+
+export function useTopicStats() {
+  return useQuery({
+    queryKey: ["topic-stats"],
+    queryFn: async (): Promise<TopicMasteryRecord[]> => {
+      const uid = await requireUserId();
+      const { data, error } = await supabase
+        .from("question_attempts")
+        .select("topic, correct, created_at")
+        .eq("user_id", uid)
+        .order("created_at", { ascending: false })
+        .limit(1000);
+      if (error) throw error;
+
+      const map = new Map<string, {
+        attempts: number;
+        correct: number;
+        recentAttempts: number;
+        recentCorrect: number;
+        lastPracticed: string | null;
+      }>();
+
+      for (const row of (data ?? []) as { topic: string; correct: boolean; created_at: string }[]) {
+        const entry = map.get(row.topic) ?? {
+          attempts: 0,
+          correct: 0,
+          recentAttempts: 0,
+          recentCorrect: 0,
+          lastPracticed: row.created_at,
+        };
+        entry.attempts += 1;
+        if (row.correct) entry.correct += 1;
+        if (entry.recentAttempts < 5) {
+          entry.recentAttempts += 1;
+          if (row.correct) entry.recentCorrect += 1;
+        }
+        if (!entry.lastPracticed || row.created_at > entry.lastPracticed) entry.lastPracticed = row.created_at;
+        map.set(row.topic, entry);
+      }
+
+      const stats = [...map.entries()].map(([topic, value]) => ({
+        topic,
+        ...calculateMastery(value),
+      }));
+
+      const recommended = recommendTopic(stats);
+      return stats.sort((a, b) =>
+        b.reviewPriorityScore - a.reviewPriorityScore ||
+        a.accuracy - b.accuracy ||
+        a.topic.localeCompare(b.topic),
+      ).map((item) => ({
+        ...item,
+        topicLabel: TOPIC_LABELS[item.topic] ?? item.topic,
+        isRecommended: recommended?.topic === item.topic,
+      })) as TopicMasteryRecord[];
+    },
+  });
+}mport { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { supabase } from "@/integrations/supabase/client";
+import { ACHIEVEMENTS, TOPIC_LABELS } from "@/content/curriculum";
+import { calculateMastery, recommendTopic, type TopicMasteryRecord } from "./mastery";
 import { completeLesson, type CompleteLessonResult, type SubmittedAnswer } from "./progress.functions";
 import { closeTrade, getPaperAccount, openTrade } from "./trading.functions";
 
