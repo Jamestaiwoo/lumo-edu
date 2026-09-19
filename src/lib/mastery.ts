@@ -128,12 +128,16 @@ export interface TopicMasteryRecord extends TopicMastery {
   topic: string;
 }
 
+export function rankTopicsForReview(stats: TopicMasteryRecord[]): TopicMasteryRecord[] {
+  return [...stats].sort(
+    (a, b) =>
+      b.reviewPriorityScore - a.reviewPriorityScore ||
+      a.accuracy - b.accuracy ||
+      (a.lastPracticed ?? "").localeCompare(b.lastPracticed ?? "") ||
+      a.topic.localeCompare(b.topic),
+  );
+}
+
 export function recommendTopic(stats: TopicMasteryRecord[]): TopicMasteryRecord | null {
-  if (!stats.length) return null;
-  return [...stats].sort((a, b) =>
-    b.reviewPriorityScore - a.reviewPriorityScore ||
-    a.accuracy - b.accuracy ||
-    (a.lastPracticed ?? "").localeCompare(b.lastPracticed ?? "") ||
-    a.topic.localeCompare(b.topic),
-  )[0] ?? null;
+  return rankTopicsForReview(stats)[0] ?? null;
 }
