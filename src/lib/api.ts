@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { ACHIEVEMENTS } from "@/content/curriculum";
-import { calculateMastery, type TopicMasteryRecord } from "./mastery";
+import { calculateMastery, rankTopicsForReview, type TopicMasteryRecord } from "./mastery";
 import { completeLesson, type CompleteLessonResult, type SubmittedAnswer } from "./progress.functions";
 import { closeTrade, getPaperAccount, openTrade } from "./trading.functions";
 
@@ -164,13 +164,12 @@ export function useTopicStats() {
         map.set(row.topic, entry);
       }
 
-      return [...map.entries()]
-        .map(([topic, value]) => ({ topic, ...calculateMastery(value) }))
-        .sort((a, b) =>
-          b.reviewPriorityScore - a.reviewPriorityScore ||
-          a.accuracy - b.accuracy ||
-          a.topic.localeCompare(b.topic),
-        );
+      const stats = [...map.entries()].map(([topic, value]) => ({
+        topic,
+        ...calculateMastery(value),
+      }));
+
+      return rankTopicsForReview(stats);
     },
   });
 }
