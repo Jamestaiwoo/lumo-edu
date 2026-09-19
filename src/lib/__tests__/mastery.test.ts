@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { calculateMastery, getMasteryStatus, getReviewPriority, rankTopicsForReview, recommendTopic } from "../mastery";
+import { getLessonForTopic, getRecommendedLesson } from "../recommendation";
 
 describe("getMasteryStatus", () => {
   it("uses the documented accuracy thresholds", () => {
@@ -89,5 +90,25 @@ describe("topic recommendation", () => {
     const original = [...stats];
     rankTopicsForReview(stats);
     expect(stats).toEqual(original);
+  });
+});
+
+
+describe("lesson-aware recommendations", () => {
+  it("maps a topic to the lesson that teaches it", () => {
+    expect(getLessonForTopic("position-sizing")?.id).toBe("w2l1");
+  });
+
+  it("returns an unlocked lesson without changing progression", () => {
+    expect(getRecommendedLesson("position-sizing", 4)?.id).toBe("w2l1");
+  });
+
+  it("does not bypass sequential lesson locks", () => {
+    expect(getRecommendedLesson("position-sizing", 0)).toBeUndefined();
+  });
+
+  it("returns undefined for unknown topics", () => {
+    expect(getLessonForTopic("unknown-topic")).toBeUndefined();
+    expect(getRecommendedLesson("unknown-topic", 99)).toBeUndefined();
   });
 });
