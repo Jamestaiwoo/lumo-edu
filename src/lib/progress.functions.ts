@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { WORLDS, getLesson, worldOfLesson, type Question } from "@/content/curriculum";
+import { LESSON_ORDER, WORLDS, getLesson, worldOfLesson, type Question } from "@/content/curriculum";
+import { isLessonUnlocked } from "./recommendation";
 import { advanceStreak, isoDate, lessonXp, levelForXp } from "./scoring";
 
 export type SubmittedAnswer = { questionId: string; raw: string };
@@ -41,6 +42,21 @@ export const completeLesson = createServerFn({ method: "POST" })
     const lesson = getLesson(data.lessonId);
     const world = worldOfLesson(data.lessonId);
     if (!lesson || !world) throw new Error("That lesson doesn't exist.");
+
+    // Enforce the learning path on the server as well as in the UI.
+    // A client must never be able to submit a locked lesson by calling this function directly.
+    const lessonIndex = LESSON_ORDER.indexOf(lesson.id);
+    if (lessonIndex > 0) {
+      const previousLessonId = LESSON_ORDER[lessonIndex - 1];
+      const { data: previousProgress, error: previousProgressErr } = await supabase
+        .from("lesson_progress")
+        .select("completed")
+        .eq("user_id", userId)
+        .eq("lesson_id", previousLessonId)
+        .maybeSingle();
+      if (previousProgressErr) throw new Error(previousProgressErr.message);
+      if (!previousProgress?.completed) throw new Error("Finish the previous lesson first.");
+    }
 
     // ---- grade on the server
     const graded = lesson.questions.map((q) => {
