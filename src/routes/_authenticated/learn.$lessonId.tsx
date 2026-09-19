@@ -7,7 +7,9 @@ import { Disclaimer } from "@/components/Disclaimer";
 import { getLesson, worldOfLesson, type Question } from "@/content/curriculum";
 import { useCompleteLesson, ACHIEVEMENT_MAP } from "@/lib/api";
 import type { SubmittedAnswer } from "@/lib/progress.functions";
-import { ErrorBanner } from "@/components/state/StateViews";
+import { ErrorBanner, LoadingState } from "@/components/state/StateViews";
+import { useProgress } from "@/lib/api";
+import { isLessonUnlocked } from "@/lib/recommendation";
 
 export const Route = createFileRoute("/_authenticated/learn/$lessonId")({
   head: () => ({
@@ -29,6 +31,7 @@ function LessonPage() {
   const lesson = getLesson(lessonId);
   const world = worldOfLesson(lessonId);
   const complete = useCompleteLesson();
+  const progressQuery = useProgress();
 
   const [index, setIndex] = useState(0);
   const [choice, setChoice] = useState<number | null>(null);
@@ -50,6 +53,22 @@ function LessonPage() {
     [index, lesson],
   );
 
+  if (progressQuery.isPending) {
+    return <LoadingState label="Loading lesson…" rows={4} />;
+  }
+
+  if (progressQuery.isError) {
+    return (
+      <div className="mx-auto max-w-md px-5 py-16 text-center">
+        <p className="text-sm text-muted-foreground">We couldn't verify your learning progress.</p>
+        <Button className="mt-4" onClick={() => progressQuery.refetch()}>Try again</Button>
+      </div>
+    );
+  }
+
+  const completedLessonIds = (progressQuery.data ?? []).filter((p) => p.completed).map((p) => p.lesson_id);
+  const lessonUnlocked = lesson ? isLessonUnlocked(lesson.id, completedLessonIds) : false;
+
   if (!lesson || !question || !world) {
     return (
       <div className="mx-auto max-w-md px-5 py-16 text-center">
@@ -57,6 +76,16 @@ function LessonPage() {
         <Link to="/learn" className="mt-4 inline-block text-sm font-semibold text-primary">
           Back to the path
         </Link>
+      </div>
+    );
+  }
+
+  if (!lessonUnlocked) {
+    return (
+      <div className="mx-auto max-w-md px-5 py-16 text-center">
+        <p className="text-sm font-semibold">Finish the previous lesson first.</p>
+        <p className="mt-1 text-xs text-muted-foreground">Lumo unlocks the learning path one lesson at a time.</p>
+        <Button className="mt-4" onClick={() => navigate({ to: "/learn" })}>Back to path</Button>
       </div>
     );
   }
