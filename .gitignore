@@ -30,3 +30,22 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Local agent tooling (do not commit)
+.agents/
+.claude/
+.cline/
+.clinerules/
+.cursor/
+.devin/
+.gemini/
+.hermes/
+.iflow/
+openspec/
+.github/agents/
+.github/prompts/
+.github/skills/
+
+# Stale duplicate checkout accidentally created at repo root
+/lumo-edu/
+
