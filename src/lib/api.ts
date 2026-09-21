@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { ACHIEVEMENTS } from "@/content/curriculum";
+import { calculateMastery, rankTopicsForReview, type TopicMasteryRecord } from "./mastery";
 import { completeLesson, type CompleteLessonResult, type SubmittedAnswer } from "./progress.functions";
 import { closeTrade, getPaperAccount, openTrade } from "./trading.functions";
 
@@ -127,25 +128,48 @@ export function useAchievements() {
 export function useTopicStats() {
   return useQuery({
     queryKey: ["topic-stats"],
-    queryFn: async () => {
+    queryFn: async (): Promise<TopicMasteryRecord[]> => {
       const uid = await requireUserId();
       const { data, error } = await supabase
         .from("question_attempts")
-        .select("topic, correct")
+        .select("topic, correct, created_at")
         .eq("user_id", uid)
         .order("created_at", { ascending: false })
         .limit(1000);
       if (error) throw error;
-      const map = new Map<string, { total: number; correct: number }>();
-      for (const row of (data ?? []) as { topic: string; correct: boolean }[]) {
-        const e = map.get(row.topic) ?? { total: 0, correct: 0 };
-        e.total += 1;
-        if (row.correct) e.correct += 1;
-        map.set(row.topic, e);
+
+      const map = new Map<string, {
+        attempts: number;
+        correct: number;
+        recentAttempts: number;
+        recentCorrect: number;
+        lastPracticed: string | null;
+      }>();
+
+      for (const row of (data ?? []) as { topic: string; correct: boolean; created_at: string }[]) {
+        const entry = map.get(row.topic) ?? {
+          attempts: 0,
+          correct: 0,
+          recentAttempts: 0,
+          recentCorrect: 0,
+          lastPracticed: row.created_at,
+        };
+        entry.attempts += 1;
+        if (row.correct) entry.correct += 1;
+        if (entry.recentAttempts < 5) {
+          entry.recentAttempts += 1;
+          if (row.correct) entry.recentCorrect += 1;
+        }
+        if (!entry.lastPracticed || row.created_at > entry.lastPracticed) entry.lastPracticed = row.created_at;
+        map.set(row.topic, entry);
       }
-      return [...map.entries()]
-        .map(([topic, v]) => ({ topic, ...v, accuracy: v.correct / v.total }))
-        .sort((a, b) => a.accuracy - b.accuracy);
+
+      const stats = [...map.entries()].map(([topic, value]) => ({
+        topic,
+        ...calculateMastery(value),
+      }));
+
+      return rankTopicsForReview(stats);
     },
   });
 }
@@ -160,12 +184,14 @@ export function useCompleteLesson() {
   return useMutation({
     mutationFn: async (input: { lessonId: string; answers: SubmittedAnswer[] }): Promise<CompleteLessonResult> =>
       submit({ data: input }),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["profile"] });
-      qc.invalidateQueries({ queryKey: ["progress"] });
-      qc.invalidateQueries({ queryKey: ["achievements"] });
-      qc.invalidateQueries({ queryKey: ["topic-stats"] });
-      qc.invalidateQueries({ queryKey: ["today-xp"] });
+    onSuccess: async () => {
+      await Promise.all([
+        qc.invalidateQueries({ queryKey: ["profile"] }),
+        qc.invalidateQueries({ queryKey: ["progress"] }),
+        qc.invalidateQueries({ queryKey: ["achievements"] }),
+        qc.invalidateQueries({ queryKey: ["topic-stats"] }),
+        qc.invalidateQueries({ queryKey: ["today-xp"] }),
+      ]);
     },
   });
 }

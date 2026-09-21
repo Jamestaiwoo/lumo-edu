@@ -6,6 +6,7 @@ import { AppShell } from "@/components/AppShell";
 import { Disclaimer } from "@/components/Disclaimer";
 import { useAchievements, useProfile, useProgress, useTopicStats } from "@/lib/api";
 import { ACHIEVEMENTS, ALL_LESSONS, TOPIC_LABELS, WORLDS } from "@/content/curriculum";
+import { COURSES, COURSE_LESSONS, courseLessons, getModuleOfLesson } from "@/content/course";
 import { levelFromXp, money, todayISO } from "@/lib/game";
 import { supabase } from "@/integrations/supabase/client";
 import { ErrorBanner, ErrorState, LoadingState } from "@/components/state/StateViews";
@@ -14,9 +15,15 @@ export const Route = createFileRoute("/_authenticated/home")({
   head: () => ({
     meta: [
       { title: "Your dashboard — Lumo" },
-      { name: "description", content: "Your streak, XP, daily goal and next trading lesson at a glance." },
+      {
+        name: "description",
+        content: "Your streak, XP, daily goal and next trading lesson at a glance.",
+      },
       { property: "og:title", content: "Your dashboard — Lumo" },
-      { property: "og:description", content: "Your streak, XP, daily goal and next trading lesson at a glance." },
+      {
+        property: "og:description",
+        content: "Your streak, XP, daily goal and next trading lesson at a glance.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -76,14 +83,27 @@ function HomePage() {
   }
 
   const completed = new Set(progress.filter((p) => p.completed).map((p) => p.lesson_id));
-  const nextLesson = ALL_LESSONS.find((l) => !completed.has(l.id)) ?? ALL_LESSONS[0];
-  const world = WORLDS.find((w) => w.lessons.some((l) => l.id === nextLesson?.id));
+  const nextCourseLesson = COURSE_LESSONS.find((l) => !completed.has(l.id));
+  const nextLegacyLesson = ALL_LESSONS.find((l) => !completed.has(l.id)) ?? ALL_LESSONS[0];
+  const courseOfNext = nextCourseLesson
+    ? getModuleOfLesson(nextCourseLesson.id)?.course
+    : undefined;
+  const courseProgress = (() => {
+    const ids = courseLessons(COURSES[0]?.id ?? "").map((l) => l.id);
+    const done = ids.filter((id) => completed.has(id)).length;
+    return { done, total: ids.length, pct: ids.length ? Math.round((done / ids.length) * 100) : 0 };
+  })();
+  const nextLesson = nextCourseLesson ?? nextLegacyLesson;
+  const world = WORLDS.find((w) => w.lessons.some((l) => l.id === nextLegacyLesson?.id));
   const lv = levelFromXp(profile.xp);
   const goalPct = Math.min(100, (todayXp / Math.max(profile.daily_goal_xp, 1)) * 100);
   const weakest = topics.filter((t) => t.total >= 2 && t.accuracy < 0.75).slice(0, 3);
 
   return (
-    <AppShell title={`Hi, ${profile.display_name}`} subtitle="Learn trading. One decision at a time.">
+    <AppShell
+      title={`Hi, ${profile.display_name}`}
+      subtitle="Learn trading. One decision at a time."
+    >
       <div className="flex flex-col gap-4">
         {progressQuery.isError && <ErrorBanner error={progressQuery.error} />}
         {achievementsQuery.isError && <ErrorBanner error={achievementsQuery.error} />}
@@ -93,7 +113,10 @@ function HomePage() {
               <p className="text-xs uppercase tracking-wide text-muted-foreground">Today's goal</p>
               <p className="mt-1 text-2xl font-bold">
                 {todayXp}
-                <span className="text-base font-medium text-muted-foreground"> / {profile.daily_goal_xp} XP</span>
+                <span className="text-base font-medium text-muted-foreground">
+                  {" "}
+                  / {profile.daily_goal_xp} XP
+                </span>
               </p>
             </div>
             <div className="flex items-center gap-1.5 rounded-full bg-accent/15 px-3 py-1.5 text-sm font-bold text-accent">
@@ -102,14 +125,38 @@ function HomePage() {
             </div>
           </div>
           <div className="mt-3 h-2.5 overflow-hidden rounded-full bg-secondary">
-            <div className="h-full rounded-full bg-primary transition-all" style={{ width: `${goalPct}%` }} />
+            <div
+              className="h-full rounded-full bg-primary transition-all"
+              style={{ width: `${goalPct}%` }}
+            />
           </div>
           <p className="mt-2 text-xs text-muted-foreground">
             Level {lv.level} · {lv.intoLevel}/{lv.needed} XP to level {lv.level + 1}
           </p>
         </section>
 
-        {nextLesson && (
+        {nextCourseLesson && courseOfNext && (
+          <Link
+            to="/learn/course/$lessonId"
+            params={{ lessonId: nextCourseLesson.id }}
+            className="flex items-center gap-4 rounded-2xl border border-primary/40 bg-primary/5 p-4 transition active:scale-[0.99]"
+          >
+            <span className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-primary text-primary-foreground">
+              <Play className="size-5 fill-current" aria-hidden />
+            </span>
+            <span className="min-w-0">
+              <span className="block text-[11px] uppercase tracking-wide text-muted-foreground">
+                {courseOfNext.title} · {courseProgress.done}/{courseProgress.total} done
+              </span>
+              <span className="block truncate text-sm font-bold">{nextCourseLesson.title}</span>
+              <span className="block truncate text-xs text-muted-foreground">
+                {nextCourseLesson.blurb}
+              </span>
+            </span>
+          </Link>
+        )}
+
+        {nextLesson && !nextCourseLesson && (
           <Link
             to="/learn/$lessonId"
             params={{ lessonId: nextLesson.id }}
@@ -123,7 +170,9 @@ function HomePage() {
                 {world?.title ?? "Next up"}
               </span>
               <span className="block truncate text-sm font-bold">{nextLesson.title}</span>
-              <span className="block truncate text-xs text-muted-foreground">{nextLesson.blurb}</span>
+              <span className="block truncate text-xs text-muted-foreground">
+                {nextLesson.blurb}
+              </span>
             </span>
           </Link>
         )}
@@ -132,7 +181,7 @@ function HomePage() {
           <StatCard
             icon={<Target className="size-4 text-primary" aria-hidden />}
             label="Lessons done"
-            value={`${completed.size}/${ALL_LESSONS.length}`}
+            value={`${completed.size}/${ALL_LESSONS.length + COURSE_LESSONS.length}`}
           />
           <StatCard
             icon={<Trophy className="size-4 text-accent" aria-hidden />}

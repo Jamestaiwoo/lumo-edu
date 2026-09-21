@@ -1,6 +1,9 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { WORLDS, getLesson, worldOfLesson, type Question } from "@/content/curriculum";
+import { WORLDS, type Question } from "@/content/curriculum";
+import { COURSES, courseLessons } from "@/content/course";
+import { resolveLesson } from "@/content/lessons";
+import { isLessonUnlocked } from "./recommendation";
 import { advanceStreak, isoDate, lessonXp, levelForXp } from "./scoring";
 
 export type SubmittedAnswer = { questionId: string; raw: string };
@@ -19,9 +22,12 @@ export type CompleteLessonResult = {
 /** Authoritative grading — the client's opinion of correctness is ignored. */
 function grade(question: Question, raw: string): boolean {
   const value = (raw ?? "").trim();
+  // An empty answer is never correct — `Number("") === 0` would otherwise
+  // grade a blank as correct for mcq option 0 / true-false "True".
+  if (value === "") return false;
   if (question.type === "mcq") return Number(value) === question.answer;
   if (question.type === "truefalse") return (Number(value) === 0) === question.answer;
-  const num = Number(value.replace(/[^0-9.\-]/g, ""));
+  const num = Number(value.replace(/[^0-9.-]/g, ""));
   if (!Number.isFinite(num)) return false;
   return Math.abs(num - question.answer) <= (question.tolerance ?? 0.01);
 }
@@ -33,14 +39,32 @@ export const completeLesson = createServerFn({ method: "POST" })
     if (!Array.isArray(input.answers)) throw new Error("Missing answers");
     return {
       lessonId: input.lessonId,
-      answers: input.answers.map((a) => ({ questionId: String(a.questionId), raw: String(a.raw ?? "") })),
+      answers: input.answers.map((a) => ({
+        questionId: String(a.questionId),
+        raw: String(a.raw ?? ""),
+      })),
     };
   })
   .handler(async ({ data, context }): Promise<CompleteLessonResult> => {
     const { supabase, userId } = context;
-    const lesson = getLesson(data.lessonId);
-    const world = worldOfLesson(data.lessonId);
-    if (!lesson || !world) throw new Error("That lesson doesn't exist.");
+    const lesson = resolveLesson(data.lessonId);
+    if (!lesson) throw new Error("That lesson doesn't exist.");
+
+    // Enforce the same sequential learning path on the server as in the UI.
+    // A client must never be able to submit a locked lesson by calling this function directly.
+    const { data: progressRows, error: progressErr } = await supabase
+      .from("lesson_progress")
+      .select("lesson_id, completed")
+      .eq("user_id", userId);
+    if (progressErr) throw new Error(progressErr.message);
+
+    const completedLessonIds = (progressRows ?? [])
+      .filter((row) => row.completed)
+      .map((row) => row.lesson_id as string);
+
+    if (!isLessonUnlocked(lesson.id, completedLessonIds)) {
+      throw new Error("Finish the previous lesson first.");
+    }
 
     // ---- grade on the server
     const graded = lesson.questions.map((q) => {
@@ -82,7 +106,7 @@ export const completeLesson = createServerFn({ method: "POST" })
       {
         user_id: userId,
         lesson_id: lesson.id,
-        world_id: world.id,
+        world_id: lesson.containerId,
         completed: true,
         best_score: Math.max(prev?.best_score ?? 0, correct),
         total_questions: total,
@@ -130,11 +154,11 @@ export const completeLesson = createServerFn({ method: "POST" })
     }
 
     // ---- achievements, decided on the server
-    const { data: progressRows } = await supabase
+    const { data: achievementProgressRows } = await supabase
       .from("lesson_progress")
       .select("lesson_id, completed")
       .eq("user_id", userId);
-    const done = (progressRows ?? []) as { lesson_id: string; completed: boolean }[];
+    const done = (achievementProgressRows ?? []) as { lesson_id: string; completed: boolean }[];
 
     const candidates: string[] = [];
     if (done.some((d) => d.completed)) candidates.push("first_lesson");
@@ -146,6 +170,18 @@ export const completeLesson = createServerFn({ method: "POST" })
     if (w1 && w1.lessons.every((l) => done.some((d) => d.lesson_id === l.id && d.completed)))
       candidates.push("world_1");
 
+    // Courses declare their own completion achievement, so new courses do not
+    // need any change to this function.
+    for (const course of COURSES) {
+      const ids = courseLessons(course.id).map((lesson) => lesson.id);
+      if (
+        ids.length > 0 &&
+        ids.every((id) => done.some((d) => d.lesson_id === id && d.completed))
+      ) {
+        candidates.push(course.completionAchievement);
+      }
+    }
+
     let newAchievements: string[] = [];
     if (candidates.length) {
       const { data: existing } = await supabase
@@ -156,12 +192,10 @@ export const completeLesson = createServerFn({ method: "POST" })
       const have = new Set((existing ?? []).map((r) => r.code));
       newAchievements = candidates.filter((c) => !have.has(c));
       if (newAchievements.length) {
-        await supabase
-          .from("achievements")
-          .upsert(
-            newAchievements.map((code) => ({ user_id: userId, code })),
-            { onConflict: "user_id,code" },
-          );
+        await supabase.from("achievements").upsert(
+          newAchievements.map((code) => ({ user_id: userId, code })),
+          { onConflict: "user_id,code" },
+        );
       }
     }
 

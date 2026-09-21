@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { INSTRUMENTS, getLivePrice, getPriceWithFallback, pnlFor } from "./market";
 import { MAX_OPEN_POSITIONS, validateClose, validateOpen, type TradeSide } from "./scoring";
@@ -10,7 +11,7 @@ export type PaperAccount = {
 };
 
 async function ensureAccount(
-  supabase: { from: (t: string) => any },
+  supabase: Pick<SupabaseClient, "from">,
   userId: string,
 ): Promise<PaperAccount> {
   const { data, error } = await supabase
@@ -42,7 +43,7 @@ async function ensureAccount(
 export const getPaperAccount = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }): Promise<PaperAccount> =>
-    ensureAccount(context.supabase as never, context.userId),
+    ensureAccount(context.supabase, context.userId),
   );
 
 /**
@@ -80,7 +81,7 @@ export const openTrade = createServerFn({ method: "POST" })
     const price = await getLivePrice(data.symbol);
     if (price <= 0) throw new Error("Price unavailable. Try again in a moment.");
     
-    const account = await ensureAccount(supabase as never, userId);
+    const account = await ensureAccount(supabase, userId);
 
     const { count, error: countErr } = await supabase
       .from("paper_trades")

@@ -1,0 +1,48 @@
+name: Lumo CI
+
+on:
+  push:
+    branches:
+      - main
+      - "sprint-2/**"
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test-build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "20"
+          package-manager-cache: false
+
+      - name: Install dependencies
+        run: npm install --legacy-peer-deps --no-audit --no-fund
+
+      - name: Run tests
+        run: npm test
+
+      - name: Format code for lint validation
+        run: npx prettier --write .
+
+      - name: Run lint
+        run: npm run lint
+
+      - name: Build
+        run: npm run build
