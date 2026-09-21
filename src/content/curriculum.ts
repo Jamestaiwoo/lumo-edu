@@ -101,7 +101,8 @@ export const WORLDS: World[] = [
             prompt: "Which participant provides continuous two-sided quotes?",
             options: ["A market maker", "A regulator", "A custodian", "An auditor"],
             answer: 0,
-            explain: "Market makers quote both a bid and an ask, earning the spread for providing liquidity.",
+            explain:
+              "Market makers quote both a bid and an ask, earning the spread for providing liquidity.",
           },
           {
             id: "w1l1q5",
@@ -126,7 +127,8 @@ export const WORLDS: World[] = [
             prompt: "You want to buy immediately. Which price do you pay?",
             options: ["The bid", "The ask", "The midpoint", "Yesterday's close"],
             answer: 1,
-            explain: "Buyers who want to trade now lift the ask; sellers who want out now hit the bid.",
+            explain:
+              "Buyers who want to trade now lift the ask; sellers who want out now hit the bid.",
           },
           {
             id: "w1l2q2",
@@ -136,7 +138,8 @@ export const WORLDS: World[] = [
             answer: 6,
             tolerance: 0.01,
             unit: "cents",
-            explain: "20.16 − 20.10 = 0.06, or 6 cents. You pay that gap the moment you enter and exit.",
+            explain:
+              "20.16 − 20.10 = 0.06, or 6 cents. You pay that gap the moment you enter and exit.",
           },
           {
             id: "w1l2q3",
@@ -158,7 +161,8 @@ export const WORLDS: World[] = [
               "The exchange's founding year",
             ],
             answer: 0,
-            explain: "Small spreads compound. Fifty round trips at 6 cents is a real drag on results.",
+            explain:
+              "Small spreads compound. Fifty round trips at 6 cents is a real drag on results.",
           },
           {
             id: "w1l2q5",
@@ -172,7 +176,8 @@ export const WORLDS: World[] = [
               "Interest paid on cash",
             ],
             answer: 1,
-            explain: "Fast markets and thin books mean your fill can land away from the price you saw.",
+            explain:
+              "Fast markets and thin books mean your fill can land away from the price you saw.",
           },
         ],
       },
@@ -201,12 +206,7 @@ export const WORLDS: World[] = [
             type: "mcq",
             topic: "orders",
             prompt: "A market order guarantees…",
-            options: [
-              "Your price",
-              "A fill, but not a price",
-              "Both price and fill",
-              "Neither",
-            ],
+            options: ["Your price", "A fill, but not a price", "Both price and fill", "Neither"],
             answer: 1,
             explain: "Market orders prioritise speed. In thin markets that can mean a poor fill.",
           },
@@ -216,7 +216,8 @@ export const WORLDS: World[] = [
             topic: "orders",
             prompt: "A stop-loss order becomes active only when price reaches your stop level.",
             answer: true,
-            explain: "Until triggered it sits dormant; once hit, it usually becomes a market order.",
+            explain:
+              "Until triggered it sits dormant; once hit, it usually becomes a market order.",
           },
           {
             id: "w1l3q4",
@@ -225,7 +226,8 @@ export const WORLDS: World[] = [
             prompt: "You are long and want to lock in gains automatically. You would use a…",
             options: ["Take-profit order", "Second buy order", "Deposit", "Watchlist alert only"],
             answer: 0,
-            explain: "A take-profit exits your position at a chosen better price without you watching.",
+            explain:
+              "A take-profit exits your position at a chosen better price without you watching.",
           },
           {
             id: "w1l3q5",
@@ -250,7 +252,8 @@ export const WORLDS: World[] = [
             prompt: "On a candlestick, the thin lines above and below the body are the…",
             options: ["Wicks (shadows)", "Volume bars", "Moving averages", "Order book"],
             answer: 0,
-            explain: "Wicks show the extremes traded during the period; the body shows open to close.",
+            explain:
+              "Wicks show the extremes traded during the period; the body shows open to close.",
           },
           {
             id: "w1l4q2",
@@ -341,7 +344,8 @@ export const WORLDS: World[] = [
             topic: "position-sizing",
             prompt: "A wider stop means you should buy fewer shares to keep risk constant.",
             answer: true,
-            explain: "Size and stop distance move in opposite directions when dollar risk is fixed.",
+            explain:
+              "Size and stop distance move in opposite directions when dollar risk is fixed.",
           },
           {
             id: "w2l1q4",
@@ -362,7 +366,12 @@ export const WORLDS: World[] = [
             type: "mcq",
             topic: "position-sizing",
             prompt: "Risking 25% of an account per trade mainly increases the chance of…",
-            options: ["Faster learning", "Ruin from a short losing streak", "Lower spreads", "Better fills"],
+            options: [
+              "Faster learning",
+              "Ruin from a short losing streak",
+              "Lower spreads",
+              "Better fills",
+            ],
             answer: 1,
             explain:
               "Four losses in a row would wipe the account. Small risk keeps you in the game long enough to learn.",
@@ -417,7 +426,8 @@ export const WORLDS: World[] = [
             topic: "stops",
             prompt: "Being stopped out means you made a mistake.",
             answer: false,
-            explain: "A good process still produces losing trades. Losses are a cost of doing business.",
+            explain:
+              "A good process still produces losing trades. Losses are a cost of doing business.",
           },
           {
             id: "w2l2q5",
@@ -485,7 +495,8 @@ export const WORLDS: World[] = [
               "Reduces spread",
             ],
             answer: 0,
-            explain: "It shrinks the average win and grows the average loss — the opposite of the goal.",
+            explain:
+              "It shrinks the average win and grows the average loss — the opposite of the goal.",
           },
           {
             id: "w2l3q5",
@@ -549,7 +560,12 @@ export const WORLDS: World[] = [
             type: "mcq",
             topic: "psychology",
             prompt: "Overtrading is most often driven by…",
-            options: ["Boredom and the need for action", "Low spreads", "Long timeframes", "Small size"],
+            options: [
+              "Boredom and the need for action",
+              "Low spreads",
+              "Long timeframes",
+              "Small size",
+            ],
             answer: 0,
             explain: "No setup is a position too. Patience is a skill you can practise.",
           },
@@ -596,9 +612,15 @@ export const WORLDS: World[] = [
             type: "mcq",
             topic: "levels",
             prompt: "The more times a level is tested without breaking, the more it tends to…",
-            options: ["Attract attention and orders", "Become irrelevant", "Reduce volatility to zero", "Guarantee a bounce"],
+            options: [
+              "Attract attention and orders",
+              "Become irrelevant",
+              "Reduce volatility to zero",
+              "Guarantee a bounce",
+            ],
             answer: 0,
-            explain: "Attention concentrates orders there — which is also why breaks can be violent.",
+            explain:
+              "Attention concentrates orders there — which is also why breaks can be violent.",
           },
           {
             id: "w3l1q4",
@@ -686,7 +708,8 @@ export const WORLDS: World[] = [
             topic: "trends",
             prompt: "Trading against the dominant trend generally requires tighter risk control.",
             answer: true,
-            explain: "Counter-trend attempts have lower odds of follow-through, so define the loss clearly.",
+            explain:
+              "Counter-trend attempts have lower odds of follow-through, so define the loss clearly.",
           },
         ],
       },
@@ -708,7 +731,8 @@ export const WORLDS: World[] = [
               "The market closed early",
             ],
             answer: 0,
-            explain: "Price was rejected lower and closed back up — one clue, not a signal on its own.",
+            explain:
+              "Price was rejected lower and closed back up — one clue, not a signal on its own.",
           },
           {
             id: "w3l3q2",
@@ -738,7 +762,8 @@ export const WORLDS: World[] = [
             topic: "candles",
             prompt: "An engulfing candle is one whose body fully covers the previous body.",
             answer: true,
-            explain: "It shows a shift in who controlled the period — again, context decides value.",
+            explain:
+              "It shows a shift in who controlled the period — again, context decides value.",
           },
           {
             id: "w3l3q5",
@@ -852,17 +877,57 @@ export const TOPIC_LABELS: Record<string, string> = {
   trends: "Trends",
   candles: "Candlesticks",
   indicators: "Indicators",
+  "price-formation": "Price formation",
+  execution: "Execution",
+  fees: "Fees & costs",
+  "trade-planning": "Trade planning",
 };
 
 export const ACHIEVEMENTS: { code: string; title: string; description: string; icon: string }[] = [
-  { code: "first_lesson", title: "First Steps", description: "Complete your first lesson", icon: "footprints" },
-  { code: "perfect_lesson", title: "Flawless", description: "Score 100% on a lesson", icon: "target" },
+  {
+    code: "first_lesson",
+    title: "First Steps",
+    description: "Complete your first lesson",
+    icon: "footprints",
+  },
+  {
+    code: "perfect_lesson",
+    title: "Flawless",
+    description: "Score 100% on a lesson",
+    icon: "target",
+  },
   { code: "streak_3", title: "Warming Up", description: "Reach a 3-day streak", icon: "flame" },
-  { code: "streak_7", title: "Consistent", description: "Reach a 7-day streak", icon: "calendar-check" },
-  { code: "world_1", title: "Foundations Cleared", description: "Finish every lesson in Market Foundations", icon: "layers" },
+  {
+    code: "streak_7",
+    title: "Consistent",
+    description: "Reach a 7-day streak",
+    icon: "calendar-check",
+  },
+  {
+    code: "world_1",
+    title: "Foundations Cleared",
+    description: "Finish every lesson in Market Foundations",
+    icon: "layers",
+  },
   { code: "level_5", title: "Level 5", description: "Reach level 5", icon: "trending-up" },
-  { code: "first_trade", title: "Paper Debut", description: "Open your first paper trade", icon: "line-chart" },
-  { code: "journal_3", title: "Reflective", description: "Write 3 journal entries", icon: "notebook-pen" },
+  {
+    code: "first_trade",
+    title: "Paper Debut",
+    description: "Open your first paper trade",
+    icon: "line-chart",
+  },
+  {
+    code: "journal_3",
+    title: "Reflective",
+    description: "Write 3 journal entries",
+    icon: "notebook-pen",
+  },
+  {
+    code: "course_1_foundations",
+    title: "Foundations Built",
+    description: "Finish every lesson in Trading Foundations",
+    icon: "graduation-cap",
+  },
 ];
 
 export const DISCLAIMER =
