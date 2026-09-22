@@ -1,7 +1,8 @@
 import { createServerFn } from "@tanstack/react-start";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { INSTRUMENTS, getLivePrice, getPriceWithFallback, pnlFor } from "./market";
+import { INSTRUMENTS, pnlFor } from "./market";
+import { getMarketSnapshot, type MarketInterval } from "./market-data.server";
 import { MAX_OPEN_POSITIONS, validateClose, validateOpen, type TradeSide } from "./scoring";
 
 export type PaperAccount = {
@@ -54,14 +55,17 @@ export const getMarketPrice = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: { symbol: string }) => ({ symbol: String(input.symbol) }))
   .handler(async ({ data }) => {
-    const price = await getLivePrice(data.symbol);
-    if (price <= 0) {
-      // Fallback to simulated if API fails
-      const fallbackPrice = await getPriceWithFallback(data.symbol);
-      return { symbol: data.symbol, price: fallbackPrice, live: false, fallback: true };
-    }
-    return { symbol: data.symbol, price, live: true, fallback: false };
+    const snapshot = await getMarketSnapshot(data.symbol, "1min");
+    return { symbol: data.symbol, price: snapshot.price, live: snapshot.live, fallback: !snapshot.live };
   });
+
+export const getMarketChart = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: { symbol: string; interval: MarketInterval }) => ({
+    symbol: String(input.symbol),
+    interval: input.interval,
+  }))
+  .handler(async ({ data }) => getMarketSnapshot(data.symbol, data.interval));
 
 export const openTrade = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -78,8 +82,9 @@ export const openTrade = createServerFn({ method: "POST" })
     if (!INSTRUMENTS.some((i) => i.symbol === data.symbol)) throw new Error("Unknown instrument.");
     
     // Fetch live price from Alpha Vantage
-    const price = await getLivePrice(data.symbol);
-    if (price <= 0) throw new Error("Price unavailable. Try again in a moment.");
+    const snapshot = await getMarketSnapshot(data.symbol, "1min");
+    const price = snapshot.price;
+    if (price <= 0) throw new Error("Market price unavailable. Try again in a moment.");
     
     const account = await ensureAccount(supabase, userId);
 
@@ -156,9 +161,12 @@ export const closeTrade = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     if (!trade) throw new Error("That position no longer exists.");
 
-    // Fetch live exit price
-    const exitPrice = await getLivePrice(trade.symbol);
-    if (exitPrice <= 0) throw new Error("Price unavailable. Try again in a moment.");
+    // Use the latest available market price. If the provider is unavailable,
+    // the market-data layer returns an explicitly labelled simulated price so
+    // paper trading remains usable without pretending it is live execution.
+    const snapshot = await getMarketSnapshot(trade.symbol, "1min");
+    const exitPrice = snapshot.price;
+    if (exitPrice <= 0) throw new Error("Market price unavailable. Try again in a moment.");
     
     const check = validateClose({ exitPrice, status: trade.status });
     if (!check.ok) throw new Error(check.error);

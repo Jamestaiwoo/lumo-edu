@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { ACHIEVEMENTS } from "@/content/curriculum";
 import { calculateMastery, rankTopicsForReview, type TopicMasteryRecord } from "./mastery";
 import { completeLesson, type CompleteLessonResult, type SubmittedAnswer } from "./progress.functions";
-import { closeTrade, getPaperAccount, openTrade } from "./trading.functions";
+import { closeTrade, getMarketChart, getMarketPrice, getPaperAccount, openTrade } from "./trading.functions";
 
 export type Profile = {
   id: string;
@@ -217,6 +217,36 @@ export function useTrades() {
       if (error) throw error;
       return (data ?? []) as unknown as Trade[];
     },
+  });
+}
+
+
+
+export function useMarketChart(symbol: string, interval: "1min" | "5min" | "15min" | "1h" | "4h" | "1day" | "1week") {
+  const load = useServerFn(getMarketChart);
+  return useQuery({
+    queryKey: ["market-chart", symbol, interval],
+    queryFn: () => load({ data: { symbol, interval } }),
+    staleTime: 30_000,
+    refetchInterval: 60_000,
+    enabled: Boolean(symbol),
+  });
+}
+
+export function useLivePrices(symbols: string[]) {
+  const load = useServerFn(getMarketPrice);
+  const stableSymbols = [...new Set(symbols)].sort();
+  return useQuery({
+    queryKey: ["market-prices", stableSymbols],
+    queryFn: async () => {
+      const entries = await Promise.all(
+        stableSymbols.map(async (symbol) => [symbol, await load({ data: { symbol } })] as const),
+      );
+      return Object.fromEntries(entries);
+    },
+    staleTime: 30_000,
+    refetchInterval: 60_000,
+    enabled: stableSymbols.length > 0,
   });
 }
 
