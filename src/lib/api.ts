@@ -222,7 +222,7 @@ export function useTrades() {
 
 
 
-export function useMarketChart(symbol: string, interval: "5min" | "15min" | "1h" | "1day" | "1week") {
+export function useMarketChart(symbol: string, interval: "1min" | "5min" | "15min" | "1h" | "4h" | "1day" | "1week") {
   const load = useServerFn(getMarketChart);
   return useQuery({
     queryKey: ["market-chart", symbol, interval],
