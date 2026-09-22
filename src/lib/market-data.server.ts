@@ -22,7 +22,7 @@ export type MarketSnapshot = {
   message?: string;
 };
 
-export type MarketInterval = "5min" | "15min" | "1h" | "1day" | "1week";
+export type MarketInterval = "1min" | "5min" | "15min" | "1h" | "4h" | "1day" | "1week";
 
 const API_BASE = "https://www.alphavantage.co/query";
 const API_KEY = process.env.ALPHA_VANTAGE_API_KEY;
@@ -107,8 +107,29 @@ async function request(params: Record<string, string>) {
   return data;
 }
 
+function aggregateCandles(candles: Candle[], bucketHours: number): Candle[] {
+  const buckets = new Map<number, Candle>();
+  const bucketMs = bucketHours * 60 * 60 * 1000;
+  for (const candle of candles) {
+    const timestamp = Date.parse(candle.time.replace(" ", "T") + (candle.time.includes("T") ? "" : "Z"));
+    const key = Number.isFinite(timestamp) ? Math.floor(timestamp / bucketMs) * bucketMs : NaN;
+    if (!Number.isFinite(key)) continue;
+    const current = buckets.get(key);
+    if (!current) {
+      buckets.set(key, { ...candle, time: new Date(key).toISOString() });
+    } else {
+      current.high = Math.max(current.high, candle.high);
+      current.low = Math.min(current.low, candle.low);
+      current.close = candle.close;
+      current.volume =
+        current.volume == null || candle.volume == null ? null : current.volume + candle.volume;
+    }
+  }
+  return [...buckets.values()].sort((a, b) => a.time.localeCompare(b.time));
+}
+
 async function fetchProviderCandles(symbol: string, assetClass: MarketAssetClass, interval: MarketInterval): Promise<Candle[]> {
-  const effectiveInterval = intervalForAsset(assetClass, interval);
+  const effectiveInterval = intervalForAsset(assetClass, interval === "4h" ? "1h" : interval);
   let data: Record<string, unknown> | null;
 
   if (assetClass === "stock") {
@@ -180,7 +201,7 @@ export async function getMarketSnapshot(symbolInput: string, interval: MarketInt
   if (cached && cached.expiresAt > Date.now()) return cached.value;
 
   try {
-    const candles = await fetchProviderCandles(symbol, assetClass, interval);
+    let candles = await fetchProviderCandles(symbol, assetClass, interval);\n    if (interval === "4h") candles = aggregateCandles(candles, 4);
     if (candles.length > 0) {
       const value: MarketSnapshot = {
         symbol,
