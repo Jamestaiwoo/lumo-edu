@@ -327,47 +327,45 @@ async function fetchAlphaVantage(symbol: string, assetClass: MarketAssetClass, i
   return candles;
 }
 
-type ProviderFetcher = () => Promise<Candle[]>;
+type ProviderFetcher = {
+  provider: Exclude<MarketProvider, "simulated">;
+  fetch: () => Promise<Candle[]>;
+};
 
-function providerOrder(assetClass: MarketAssetClass): Array<ProviderFetcher> {
+function providerOrder(
+  symbol: string,
+  assetClass: MarketAssetClass,
+  interval: MarketInterval,
+): ProviderFetcher[] {
   if (assetClass === "crypto") {
     return [
-      () => fetchCoinGecko(currentSymbol!, currentInterval!),
-      () => fetchTwelveData(currentSymbol!, currentInterval!),
-      () => fetchAlphaVantage(currentSymbol!, assetClass, currentInterval!),
+      { provider: "coingecko", fetch: () => fetchCoinGecko(symbol, interval) },
+      { provider: "twelve-data", fetch: () => fetchTwelveData(symbol, interval) },
+      { provider: "alpha-vantage", fetch: () => fetchAlphaVantage(symbol, assetClass, interval) },
     ];
   }
 
   return [
-    () => fetchTwelveData(currentSymbol!, currentInterval!),
-    () => fetchAlphaVantage(currentSymbol!, assetClass, currentInterval!),
+    { provider: "twelve-data", fetch: () => fetchTwelveData(symbol, interval) },
+    { provider: "alpha-vantage", fetch: () => fetchAlphaVantage(symbol, assetClass, interval) },
   ];
 }
 
-let currentSymbol: string | undefined;
-let currentInterval: MarketInterval | undefined;
-
-async function fetchWithFallback(symbol: string, assetClass: MarketAssetClass, interval: MarketInterval) {
-  currentSymbol = symbol;
-  currentInterval = interval;
-
-  try {
-    const providers = providerOrder(assetClass);
-
-    for (const provider of providers) {
-      try {
-        const candles = await provider();
-        if (candles.length > 0) return candles;
-      } catch (error) {
-        console.warn("[Market] Provider failed:", error);
-      }
+async function fetchWithFallback(
+  symbol: string,
+  assetClass: MarketAssetClass,
+  interval: MarketInterval,
+): Promise<{ provider: Exclude<MarketProvider, "simulated">; candles: Candle[] } | null> {
+  for (const candidate of providerOrder(symbol, assetClass, interval)) {
+    try {
+      const candles = await candidate.fetch();
+      if (candles.length > 0) return { provider: candidate.provider, candles };
+    } catch (error) {
+      console.warn(`[Market] ${candidate.provider} failed:`, error);
     }
-
-    return [];
-  } finally {
-    currentSymbol = undefined;
-    currentInterval = undefined;
   }
+
+  return null;
 }
 
 export async function getMarketSnapshot(
@@ -381,19 +379,15 @@ export async function getMarketSnapshot(
 
   if (cached && cached.expiresAt > Date.now()) return cached.value;
 
-  const candles = await fetchWithFallback(symbol, instrument.assetClass, interval);
+  const result = await fetchWithFallback(symbol, instrument.assetClass, interval);
 
-  if (candles.length > 0) {
-    const provider = instrument.assetClass === "crypto"
-      ? (COINGECKO_API_KEY ? "coingecko" : TWELVE_DATA_API_KEY ? "twelve-data" : "alpha-vantage")
-      : (TWELVE_DATA_API_KEY ? "twelve-data" : "alpha-vantage");
-
+  if (result) {
     const value: MarketSnapshot = {
       symbol,
-      price: candles[candles.length - 1]!.close,
-      candles: candles.slice(-100),
+      price: result.candles[result.candles.length - 1]!.close,
+      candles: result.candles.slice(-100),
       live: true,
-      provider,
+      provider: result.provider,
     };
 
     cache.set(cacheKey, { expiresAt: Date.now() + CACHE_TTL_MS, value });
