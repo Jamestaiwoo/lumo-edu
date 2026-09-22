@@ -1,6 +1,8 @@
 import "server-only";
 
-export type MarketAssetClass = "stock" | "forex" | "crypto";
+import { INSTRUMENTS, type AssetClass } from "./market";
+
+export type MarketAssetClass = AssetClass;
 
 export type Candle = {
   time: string;
@@ -27,14 +29,9 @@ const API_KEY = process.env.ALPHA_VANTAGE_API_KEY;
 const cache = new Map<string, { expiresAt: number; value: MarketSnapshot }>();
 const CACHE_TTL_MS = 45_000;
 
-const STOCK_SYMBOLS = new Set(["AAPL", "GOOGL", "MSFT", "TSLA", "NVDA", "AMD", "AMZN", "META", "NFLX", "JPM"]);
-const FOREX_SYMBOLS = new Set(["EUR/USD", "GBP/USD", "USD/JPY", "USD/CHF", "AUD/USD", "USD/CAD"]);
-const CRYPTO_SYMBOLS = new Set(["BTC/USD", "ETH/USD", "SOL/USD", "BNB/USD", "XRP/USD"]);
 
 export function getAssetClass(symbol: string): MarketAssetClass {
-  if (FOREX_SYMBOLS.has(symbol)) return "forex";
-  if (CRYPTO_SYMBOLS.has(symbol)) return "crypto";
-  return "stock";
+  return INSTRUMENTS.find((instrument) => instrument.symbol === symbol)?.assetClass ?? "stock";
 }
 
 function normaliseSymbol(symbol: string) {
@@ -219,20 +216,4 @@ export async function getLiveMarketPrice(symbol: string): Promise<number> {
   return snapshot.live ? snapshot.price : 0;
 }
 
-export const SUPPORTED_INSTRUMENTS = [
-  { symbol: "AAPL", name: "Apple", assetClass: "stock" as const },
-  { symbol: "MSFT", name: "Microsoft", assetClass: "stock" as const },
-  { symbol: "NVDA", name: "NVIDIA", assetClass: "stock" as const },
-  { symbol: "TSLA", name: "Tesla", assetClass: "stock" as const },
-  { symbol: "AMZN", name: "Amazon", assetClass: "stock" as const },
-  { symbol: "GOOGL", name: "Alphabet", assetClass: "stock" as const },
-  { symbol: "EUR/USD", name: "Euro / US Dollar", assetClass: "forex" as const },
-  { symbol: "GBP/USD", name: "Pound / US Dollar", assetClass: "forex" as const },
-  { symbol: "USD/JPY", name: "US Dollar / Yen", assetClass: "forex" as const },
-  { symbol: "USD/CHF", name: "US Dollar / Swiss Franc", assetClass: "forex" as const },
-  { symbol: "BTC/USD", name: "Bitcoin / US Dollar", assetClass: "crypto" as const },
-  { symbol: "ETH/USD", name: "Ethereum / US Dollar", assetClass: "crypto" as const },
-  { symbol: "SOL/USD", name: "Solana / US Dollar", assetClass: "crypto" as const },
-  { symbol: "BNB/USD", name: "BNB / US Dollar", assetClass: "crypto" as const },
-  { symbol: "XRP/USD", name: "XRP / US Dollar", assetClass: "crypto" as const },
-];
+export const SUPPORTED_INSTRUMENTS = INSTRUMENTS;\n
