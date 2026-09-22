@@ -81,7 +81,7 @@ export const openTrade = createServerFn({ method: "POST" })
 
     if (!INSTRUMENTS.some((i) => i.symbol === data.symbol)) throw new Error("Unknown instrument.");
     
-    // Fetch live price from Alpha Vantage
+    // Fetch the best available provider price through the market-data router
     const snapshot = await getMarketSnapshot(data.symbol, "1min");
     const price = snapshot.price;
     if (price <= 0) throw new Error("Market price unavailable. Try again in a moment.");
@@ -161,7 +161,7 @@ export const closeTrade = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     if (!trade) throw new Error("That position no longer exists.");
 
-    // Use the latest available market price. If the provider is unavailable,
+    // Use the latest available market price from the configured provider chain. If every provider is unavailable,
     // the market-data layer returns an explicitly labelled simulated price so
     // paper trading remains usable without pretending it is live execution.
     const snapshot = await getMarketSnapshot(trade.symbol, "1min");
