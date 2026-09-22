@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import { Flame, LineChart, ShieldCheck, Zap } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Disclaimer } from "@/components/Disclaimer";
-import { LumoLogo } from "@/components/LumoLogo";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -37,7 +36,13 @@ function Landing() {
   return (
     <div className="min-h-screen bg-background">
       <div className="mx-auto flex max-w-md flex-col gap-8 px-5 py-12">
-        <LumoLogo className="size-12" showName />
+        <div
+          aria-label="Lumo"
+          className="text-4xl font-black tracking-[-0.08em] text-primary"
+          style={{ fontFamily: '"Gramatika", "Space Grotesk", sans-serif' }}
+        >
+          Lumo
+        </div>
 
         <div>
           <h1 className="text-4xl font-bold leading-[1.05]">
