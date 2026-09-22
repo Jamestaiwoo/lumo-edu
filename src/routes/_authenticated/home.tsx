@@ -100,11 +100,16 @@ function HomePage() {
   const weakest = topics.filter((t) => t.total >= 2 && t.accuracy < 0.75).slice(0, 3);
 
   return (
-    <AppShell
-      title={`Hi, ${profile.display_name}`}
-      subtitle="Learn trading. One decision at a time."
-    >
+    <AppShell title="Home" subtitle="Learn trading. One decision at a time.">
       <div className="flex flex-col gap-4">
+        <section className="px-1 pt-1">
+          <p className="text-2xl font-black tracking-tight">
+            Hi, {profile.display_name}
+          </p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Ready to make another good trading decision?
+          </p>
+        </section>
         {progressQuery.isError && <ErrorBanner error={progressQuery.error} />}
         {achievementsQuery.isError && <ErrorBanner error={achievementsQuery.error} />}
         <section className="surface glow-primary rounded-3xl border border-primary/25 p-5">
