@@ -153,7 +153,7 @@ function CoachPage() {
   return (
     <AppShell title="AI Coach" subtitle="Explains concepts, never gives advice">
       <div className="flex flex-col gap-4">
-        <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center justify-between gap-3 rounded-2xl border border-border/60 bg-card/70 p-3">
           <div>
             <p className="text-sm font-semibold">Lumo Coach</p>
             <p className="text-xs text-muted-foreground">Learn concepts, test ideas, improve your decisions.</p>
@@ -189,21 +189,6 @@ function CoachPage() {
           </div>
         )}
 
-        {history.length > 0 && (
-          <div className="flex gap-2 overflow-x-auto pb-1">
-            {history.map((chat) => (
-              <div key={chat.id} className="group flex min-w-[190px] max-w-[230px] shrink-0 items-center gap-2 rounded-xl border border-border/60 bg-card px-3 py-2">
-                <button type="button" onClick={() => openChat(chat)} className="min-w-0 flex-1 text-left">
-                  <p className="truncate text-xs font-medium">{chat.title}</p>
-                  <p className="mt-0.5 flex items-center gap-1 text-[10px] text-muted-foreground"><Clock3 className="size-3" aria-hidden />{new Date(chat.updatedAt).toLocaleDateString()}</p>
-                </button>
-                <button type="button" onClick={() => deleteChat(chat.id)} className="rounded-md p-1.5 text-muted-foreground hover:text-destructive" aria-label="Delete chat">
-                  <Trash2 className="size-3.5" aria-hidden />
-                </button>
-              </div>
-            ))}
-          </div>
-        )}
         <div className="flex flex-col gap-3">
           {messages.map((m, i) => (
             <div
