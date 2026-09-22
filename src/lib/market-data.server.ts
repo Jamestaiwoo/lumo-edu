@@ -27,7 +27,6 @@ const API_KEY = process.env.ALPHA_VANTAGE_API_KEY;
 const cache = new Map<string, { expiresAt: number; value: MarketSnapshot }>();
 const CACHE_TTL_MS = 45_000;
 
-
 export function getAssetClass(symbol: string): MarketAssetClass {
   return INSTRUMENTS.find((instrument) => instrument.symbol === symbol)?.assetClass ?? "stock";
 }
@@ -199,7 +198,8 @@ export async function getMarketSnapshot(symbolInput: string, interval: MarketInt
   if (cached && cached.expiresAt > Date.now()) return cached.value;
 
   try {
-    let candles = await fetchProviderCandles(symbol, assetClass, interval);\n    if (interval === "4h") candles = aggregateCandles(candles, 4);
+    let candles = await fetchProviderCandles(symbol, assetClass, interval);
+    if (interval === "4h") candles = aggregateCandles(candles, 4);
     if (candles.length > 0) {
       const value: MarketSnapshot = {
         symbol,
@@ -235,4 +235,5 @@ export async function getLiveMarketPrice(symbol: string): Promise<number> {
   return snapshot.live ? snapshot.price : 0;
 }
 
-export const SUPPORTED_INSTRUMENTS = INSTRUMENTS;\n
+
+export const SUPPORTED_INSTRUMENTS = INSTRUMENTS;
