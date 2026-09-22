@@ -4,30 +4,30 @@ export const lesson01WhatIsTrading: CourseLesson = {
   id: "tf-l1",
   moduleId: "c1-m1",
   title: "What Is Trading?",
-  blurb: "Trading is an exchange of risk, not a shortcut to income.",
+  blurb: "Your first mission: understand what you are actually doing when you trade.",
   objectives: [
     "Explain what actually happens when you buy or sell an asset",
     "Separate trading from investing by intent and time horizon",
     "Describe who takes the other side of your trade and why",
     "Recognise why frequent trading is a hard way to make money",
   ],
-  durationMinutes: 9,
+  durationMinutes: 10,
   xp: 30,
   keyTakeaway:
-    "Every trade is a two-sided agreement to move risk from one person to another. You are paid for taking risk, not for being right.",
+    "Every trade is a two-sided agreement to move risk from one person to another. A good decision is not the same thing as a profitable outcome.",
   blocks: [
     {
       kind: "explain",
       id: "tf-l1-b1",
       explanation: {
-        heading: "A trade is an agreement, not an event you control",
+        heading: "MISSION 01 · What is actually happening?",
         whyItMatters:
-          "Almost every trading mistake starts with a wrong mental model. If you think buying a stock is like buying a lottery ticket, you will judge decisions by outcome instead of by process — and you will learn nothing from the winners or the losers.",
+          "Before you learn charts, indicators or strategies, you need the right mental model. Trading is not pressing a button and asking the market to make you money.",
         paragraphs: [
-          "Trading means buying or selling a financial asset in order to profit from a change in its price. You do not have to own anything for long, and you do not have to produce anything. You take a position, and the market either agrees with you or it does not.",
-          "The moment you buy, someone sold to you. That person is not asleep at the wheel. They may be a market maker earning the spread, a fund rebalancing a portfolio, a company insider selling shares, or another trader who believes the opposite of what you believe. A price exists only because the two of you accepted the same number for opposite reasons.",
-          "This is why trading is best described as an exchange of risk. The seller hands you the risk of the price falling, and in return takes the risk of the price rising. Neither of you is right by default. The market does not pay you for wanting something to happen; it pays you for being willing to be wrong, in a way you had already planned for.",
-          "Investing is the same mechanics with a different intent. An investor buys a claim on future cash flows and expects to wait years. A trader buys movement, and expects to be in and out quickly. Both can work. They are different games with different skills, and mixing the two in one account is the fastest way to break your own rules.",
+          "When you buy an asset, somebody else is willing to sell it to you at the agreed price. Your order is matched with another participant's order, and the position transfers from one side to the other.",
+          "That other participant may be another trader, a market maker, a fund, or someone trading for a completely different reason. They are not required to agree with your view of the future.",
+          "This is why trading is an exchange of risk. If you buy, you take exposure to the asset's price moving against you. If you sell, you give up that exposure in exchange for cash or another position.",
+          "Trading also has friction: spreads, commissions, fees and slippage can reduce returns. The more often you trade, the more those costs can accumulate, so frequent trading needs a strong reason to overcome them.",
         ],
         keyTerms: [
           {
@@ -35,27 +35,32 @@ export const lesson01WhatIsTrading: CourseLesson = {
             definition:
               "The exposure you currently hold in an asset — long if you benefit from it rising, short if you benefit from it falling.",
           },
-          { term: "Long", definition: "You bought something and profit if the price rises." },
+          {
+            term: "Long",
+            definition: "You bought an asset and generally benefit if its price rises.",
+          },
           {
             term: "Short",
             definition:
-              "You sold something you did not own first, and profit if the price falls. You are borrowing and repaying it.",
+              "You take a position that benefits if the asset falls, typically by borrowing and selling the asset before buying it back.",
           },
           {
             term: "Counterparty",
-            definition: "The person or system on the other side of your trade.",
+            definition: "The participant or liquidity provider on the other side of your trade; in some markets, clearing systems stand between the two participants.",
           },
         ],
         callouts: [
           {
             tone: "pitfall",
-            title: "Nobody is paying you to trade",
-            body: "Trading is a competition with costs attached. Every order pays a spread, and sometimes commission. Treat a trading account as money you are spending to learn, never as an income plan. Lumo simulates an account for exactly this reason.",
+            title: "Starting is easy. Winning is not.",
+            body:
+              "A trading account can be opened quickly. That says nothing about how difficult it is to compete, manage risk and make decisions consistently.",
           },
           {
             tone: "tip",
-            title: "Judge the decision, then the result",
-            body: "A good trade can lose money and a careless trade can make money. From here on, ask two separate questions: was the decision reasonable with the information available, and did the market cooperate?",
+            title: "Judge the decision before the result",
+            body:
+              "A sensible trade can lose money and a careless trade can make money. Separate the quality of the decision from what happened next.",
           },
         ],
       },
@@ -63,107 +68,126 @@ export const lesson01WhatIsTrading: CourseLesson = {
     {
       kind: "visual",
       id: "tf-l1-b2",
-      title: "One chart, two opportunities",
+      title: "See the trade from both sides",
       visual: {
-        type: "price-path",
-        label: "NOVA · simulated daily closes",
-        points: [40.0, 41.2, 39.6, 42.8, 41.5, 43.9, 42.1, 44.6, 43.2, 45.8, 44.9, 46.4],
-        markers: [
-          { index: 2, label: "pullback", tone: "down" },
-          { index: 7, label: "higher low", tone: "up" },
-          { index: 11, label: "new high", tone: "up" },
+        type: "table",
+        label: "One transaction, two participants",
+        columns: ["You", "Counterparty"],
+        rows: [
+          ["Buy the asset", "Sell the asset"],
+          ["Take price risk", "Give up price exposure"],
+          ["Want a reason to own it", "Have their own reason to sell"],
         ],
         caption:
-          "The same 12 closes look like noise to a long-term investor and like a sequence of decisions to a trader. Neither view is wrong — but the trader must answer a question the investor does not: where am I wrong, and how much will that cost?",
+          "The same price can make sense to both sides because they have different goals, information, time horizons or risk constraints.",
       },
     },
     {
       kind: "example",
       id: "tf-l1-b3",
       example: {
-        title: "Same price, two completely different trades",
+        title: "Same price. Different game.",
         setup:
-          "NOVA trades at $43.20. Aisha and Ben both buy 100 shares at that price on the same tick. Same asset, same moment, same number — but they are not doing the same thing.",
+          "NOVA trades at $43.20. Aisha and Ben both buy 100 shares at the same moment.",
         steps: [
           {
-            label: "Aisha's intent",
+            label: "Aisha",
             detail:
-              "She has read the company's filings, expects the business to grow over five years, and has no plan to sell before then. Her risk is that the business disappoints, and she accepts drawdowns along the way.",
+              "She expects the business to grow over several years and is prepared for short-term price swings.",
           },
           {
-            label: "Ben's intent",
+            label: "Ben",
             detail:
-              "He thinks the price will be higher in two days because buyers have been stepping in above $42.80. His risk is defined: he will exit at $41.90 if the pattern fails.",
+              "He expects a short-term price move and has a predefined point where his trading idea is invalidated.",
           },
           {
-            label: "The same entry, different losses",
+            label: "The key difference",
             detail:
-              "If NOVA drops to $41.90, Ben's idea is proven wrong and he exits for about $130. Aisha's idea is not affected at all — her thesis was never about two days.",
-          },
-          {
-            label: "Why this matters",
-            detail:
-              "The number on the screen says nothing about whether a trade is good. The plan behind the position is what makes a loss acceptable or unacceptable.",
+              "The asset and entry price are identical. Their time horizons, reasons and definitions of being wrong are different.",
           },
         ],
         takeaway:
-          "A price is shared. A reason is not. Before any entry, know whether you are buying a business or buying movement — because that decides when you are wrong.",
+          "Trading versus investing is not about which button you press. Intent and time horizon change the game you are playing.",
       },
     },
     {
       kind: "interactive",
       id: "tf-l1-b4",
-      title: "Decide like a learner",
+      title: "DECISION 01 · Choose your next move",
       interaction: {
         type: "scenario-decision",
-        prompt: "You have $500 saved and a free evening. What is the most reasonable next step?",
+        prompt:
+          "You have $500 saved, have never placed an order, and a friend says a small account can double quickly. What do you do next?",
         situation: [
-          "A friend told you that a small account can be doubled quickly with the right strategy.",
-          "You have never placed an order and you have not read anything about how markets work.",
+          "You do not yet understand how orders execute or how you would know a trade has gone wrong.",
+          "This is a simulated learning decision — there is no real money involved.",
         ],
         choices: [
           {
-            label: "Leave the $500 in savings and work through a beginner course first",
+            label: "Learn the mechanics before risking money",
             outcome:
-              "You spend the evening learning how prices form and how orders execute. Your savings are untouched.",
+              "You keep the $500 untouched and spend the evening learning how markets, orders and risk actually work.",
             best: true,
             feedback:
-              "You cannot lose money on a lesson. Education first means your first real order is a decision you understand rather than a bet you copied.",
+              "Good starting decision. The goal is not to avoid every risk forever; it is to understand the decisions you are making before taking them.",
           },
           {
-            label: "Deposit the $500 and buy something a stranger recommended",
+            label: "Buy whatever your friend recommends",
             outcome:
-              "You now hold a position you cannot explain, and you have no idea when you would be wrong.",
+              "You enter a position without knowing why you are in it or what would make the idea invalid.",
             best: false,
             feedback:
-              "The problem is not the loss itself, it is that you have no way to evaluate it. Without a reason and an exit, a position is a coin flip with fees attached.",
+              "The problem is not that the trade must lose. You have no process for evaluating either the decision or the result.",
           },
           {
-            label: "Buy a $500 course that promises a 'proven system'",
-            outcome: "You have less money and still no framework for making your own decisions.",
-            best: false,
-            feedback:
-              "Anything sold as guaranteed is a warning sign, and it also skips the part that matters: learning to reason about a market yourself.",
-          },
-          {
-            label: "Open a leveraged account so the $500 earns like $5,000",
+            label: "Use leverage so $500 controls $5,000",
             outcome:
-              "Small price moves now cause very large swings in your equity. One bad day can end the account.",
+              "Small price moves now create much larger swings in your account.",
             best: false,
             feedback:
-              "Leverage multiplies the size of your mistakes as faithfully as your wins. Learning on leverage teaches you fear, not skill.",
+              "Leverage increases exposure. It can magnify losses as quickly as it magnifies gains, making a beginner's mistakes more expensive.",
+          },
+          {
+            label: "Buy a course promising guaranteed profits",
+            outcome:
+              "You spend money on a promise instead of building your own decision-making framework.",
+            best: false,
+            feedback:
+              "Guaranteed trading profits are a warning sign. A useful education teaches you how to reason, not what outcome is guaranteed.",
           },
         ],
       },
       takeaway:
-        "The first skill in trading is not prediction, it is recognising which decisions you are equipped to make.",
+        "Your first trading skill is recognising which decisions you are equipped to make.",
+    },
+    {
+      kind: "explain",
+      id: "tf-l1-b5",
+      explanation: {
+        heading: "LEVEL UP · What does the market do back?",
+        whyItMatters:
+          "A trading decision only becomes useful when you can imagine the possible response from the market.",
+        paragraphs: [
+          "Suppose you buy because you expect price to rise. There are at least two immediate possibilities: price moves in your favour, or it moves against you.",
+          "The important question is not 'Will I win?' You cannot know that in advance. A better question is 'What would make my idea wrong, and what happens to my account if it is?'",
+        ],
+        callouts: [
+          {
+            tone: "tip",
+            title: "Think in branches",
+            body:
+              "Before acting, imagine the main paths: the market agrees, the market disagrees, or the situation changes and your original reason no longer applies.",
+          },
+        ],
+      },
     },
     {
       kind: "practice",
-      id: "tf-l1-b5",
-      title: "Guided practice",
+      id: "tf-l1-b6",
+      title: "CHALLENGE · Build the mental model",
       assessment: {
-        intro: "Take your time. A wrong answer here costs nothing and teaches plenty.",
+        intro:
+          "Choose your answer, check it, read the explanation, then retry if you want to test yourself again.",
         allowRetry: true,
         items: [
           {
@@ -175,19 +199,19 @@ export const lesson01WhatIsTrading: CourseLesson = {
               prompt: "When your buy order fills, what has actually happened?",
               options: [
                 "The exchange has issued you a new share",
-                "Someone else agreed to sell at your price and handed you the risk of the price falling",
+                "Someone else agreed to sell at your price and you took the asset's price exposure",
                 "You have been given a loan against the asset",
                 "The market has agreed that the price will rise",
               ],
               answer: 1,
               explain:
-                "Every fill matches a buyer with a seller. The seller transfers the risk of falling prices to you in exchange for your cash.",
+                "A fill matches a buyer with a seller or liquidity provider. You receive the position and its price exposure; the market makes no promise about what happens next.",
             },
             hint: "Ask who is on the other side of the fill.",
             feedbackByAnswer: {
-              "0": "Exchanges do not create shares when you buy. They match your order against someone else's order.",
-              "2": "That describes borrowing (used for short selling or margin), not a normal purchase.",
-              "3": "The market is not making a prediction. It is only showing where two people agreed to transact.",
+              "0": "The exchange provides the marketplace and matching rules. A normal purchase does not mean the exchange created a share for you.",
+              "2": "Borrowing is a different mechanism. A normal purchase is an exchange of cash for an asset position.",
+              "3": "A transaction records an agreed price. It does not predict the next price.",
             },
           },
           {
@@ -200,68 +224,18 @@ export const lesson01WhatIsTrading: CourseLesson = {
               options: [
                 "Traders use charts, investors use news",
                 "Traders pay fees, investors do not",
-                "Traders seek to profit from price movement over a short horizon; investors expect to hold and be paid by the asset over years",
+                "Traders often focus on shorter-term price movement; investors often focus on longer-term ownership and the asset's underlying value or cash flows",
                 "Investing is safe and trading is not",
               ],
               answer: 2,
               explain:
-                "It is the intent and the time horizon that differ, not the buttons you press. Both pay costs and both carry risk.",
+                "The distinction is mainly intent and time horizon. Tools overlap, both have costs, and both involve risk.",
             },
             hint: "Think about what each person is waiting for.",
             feedbackByAnswer: {
-              "0": "Tools overlap completely. A long-term investor may read a chart, and a day trader may read an annual report.",
-              "1": "Both pay spreads and sometimes commission. Costs are part of every style.",
-              "3": "Both can lose money. 'Safe' is about position size and time horizon, not about the label.",
-            },
-          },
-        ],
-      },
-    },
-    {
-      kind: "check",
-      id: "tf-l1-b6",
-      title: "Knowledge check",
-      assessment: {
-        intro: "Your first attempt is what counts towards mastery.",
-        items: [
-          {
-            skill: "Counterparties",
-            question: {
-              id: "tf-l1-q3",
-              type: "mcq",
-              topic: "participants",
-              prompt: "Why does someone agree to take the other side of your trade?",
-              options: [
-                "Because they disagree with you about price, or because they need to trade for reasons that have nothing to do with you",
-                "Because the exchange orders them to",
-                "Because they know your order is wrong",
-                "Because they are forced to accept every trade",
-              ],
-              answer: 0,
-              explain:
-                "Counterparties have their own views and obligations — hedging, rebalancing, taking profit. A trade happens when two different motivations accept one price.",
-            },
-            feedbackByAnswer: {
-              "1": "Exchanges provide the venue and the rules. They do not assign a counterparty to your order.",
-              "2": "Nobody has access to your reasoning. The other side is acting on their own reasons.",
-              "3": "Only certain designated market makers quote continuously, and even they choose their prices.",
-            },
-          },
-          {
-            skill: "Realistic expectations",
-            question: {
-              id: "tf-l1-q4",
-              type: "truefalse",
-              topic: "market-basics",
-              prompt:
-                "Because trading needs no product and no customers, it is a reliable way to replace a salary quickly.",
-              answer: false,
-              explain:
-                "Trading is a competitive activity with real costs. Frequent trading is a hard way to earn money, and promising otherwise is a hallmark of fraud.",
-            },
-            hint: "Separate how easy it is to start from how hard it is to win.",
-            feedbackByAnswer: {
-              "0": "Careful: no product and no customers makes an activity easy to start, not easy to win. Your competitors are professionals and every order pays the spread.",
+              "0": "The tools overlap. Traders can use fundamentals and investors can use charts.",
+              "1": "Both can pay spreads, commissions or other costs.",
+              "3": "Neither label removes risk. Risk depends on the asset, position, time horizon and decisions involved.",
             },
           },
         ],
@@ -270,35 +244,54 @@ export const lesson01WhatIsTrading: CourseLesson = {
     {
       kind: "scenario",
       id: "tf-l1-b7",
-      title: "Application scenario",
+      title: "FINAL CHALLENGE · Can you reason through it?",
       scenario: {
         situation: [
-          "Priya opens Lumo for the first time. She has $300 she can afford to lose in a simulated account, and a habit of buying things when friends talk about them.",
-          "Over the weekend she hears that a small biotech stock 'always pops' after announcements.",
+          "Priya is using a $300 simulated account while learning. A friend tells her that a small biotech stock 'always pops' after announcements.",
+          "Priya is tempted to buy immediately. She has not written down why the trade should work, what would prove her idea wrong, or how much she is willing to lose in the simulation.",
         ],
         assessment: {
+          intro:
+            "There is no timer. Treat this like a decision review: identify what you know, what you do not know and what could happen next.",
           items: [
             {
               skill: "Applying the lesson",
               question: {
-                id: "tf-l1-q5",
+                id: "tf-l1-q3",
                 type: "mcq",
                 topic: "market-basics",
-                prompt: "Which response best fits what you learned in this lesson?",
+                prompt: "Which response best applies what you learned?",
                 options: [
-                  "Buy immediately — the pattern has happened before",
-                  "Write down why the price might move, where she would be wrong and what that mistake would cost, then decide whether to act",
-                  "Wait for the announcement and buy at whatever price is showing",
-                  "Avoid markets completely, because risk cannot be managed",
+                  "Buy immediately because the pattern happened before",
+                  "Define the reason, possible invalidation and risk before deciding whether to act",
+                  "Wait for the announcement and buy at whatever price appears",
+                  "Avoid all markets because risk cannot be managed",
                 ],
                 answer: 1,
                 explain:
-                  "You cannot manage a risk you have not defined. Naming the reason and the invalidation comes first — and the honest conclusion may be that this trade is not for her.",
+                  "A decision needs a reason and a way to recognise when that reason no longer holds. The conclusion can still be 'do not trade' — planning comes before action.",
               },
               feedbackByAnswer: {
-                "0": "A story about what happened before is not a reason. She would hold a position with no idea what would tell her to leave.",
-                "2": "Buying after the news is not a plan either — the move may already be over, and there is still no exit.",
-                "3": "Risk cannot be removed, but it can be sized and planned. That is exactly what this course teaches.",
+                "0": "A past pattern is not enough. You still need to know what you expect and what would invalidate that expectation.",
+                "2": "Waiting for news is not a plan by itself. Price can move quickly, and you still need a defined decision process.",
+                "3": "Risk cannot be eliminated, but learning to identify, size and manage it is a core trading skill.",
+              },
+            },
+            {
+              skill: "Realistic expectations",
+              question: {
+                id: "tf-l1-q4",
+                type: "truefalse",
+                topic: "market-basics",
+                prompt:
+                  "Because trading does not require a product or customers, it is a reliable way to replace a salary quickly.",
+                answer: false,
+                explain:
+                  "Being easy to start is not the same as being easy to win. Trading is competitive, has real costs and carries the possibility of loss.",
+              },
+              hint: "Separate how easy it is to start from how hard it is to win.",
+              feedbackByAnswer: {
+                "0": "Starting an account can be easy. Producing consistent results is a different problem entirely.",
               },
             },
           ],
@@ -306,27 +299,65 @@ export const lesson01WhatIsTrading: CourseLesson = {
       },
     },
     {
-      kind: "reflection",
+      kind: "check",
       id: "tf-l1-b8",
-      title: "Reflection",
+      title: "KNOWLEDGE CHECK · Lock it in",
+      assessment: {
+        intro:
+          "Final check: can you separate a trading decision from the outcome it produces?",
+        items: [
+          {
+            skill: "Decision quality versus outcome",
+            question: {
+              id: "tf-l1-q5",
+              type: "mcq",
+              topic: "market-basics",
+              prompt:
+                "A trader follows a sensible plan, but the trade loses money. What is the best conclusion?",
+              options: [
+                "The plan was definitely bad because it lost",
+                "The plan was definitely good because it followed the rules",
+                "The result alone cannot judge the decision; review the reasoning and what happened",
+                "Trading is mostly luck, so the plan does not matter",
+              ],
+              answer: 2,
+              explain:
+                "A single outcome does not prove whether a decision was good or bad. Review the reasoning, assumptions, risk and what the market actually did.",
+            },
+            feedbackByAnswer: {
+              "0":
+                "Losses can happen even when a decision was reasonable. Judge the process separately from the outcome.",
+              "1":
+                "Following a process matters, but rules can still be flawed. Good decisions require reviewing the reasoning as well.",
+              "3":
+                "Uncertainty is real, but that does not make planning useless. A process helps you make and evaluate decisions consistently.",
+            },
+          },
+        ],
+      },
+    },
+    {
+      kind: "reflection",
+      id: "tf-l1-b9",
+      title: "BONUS · Lock in the lesson",
       helper:
-        "One or two sentences is enough. This stays in your browser — it is never graded or sent to the server.",
+        "One sentence is enough. This reflection stays in your browser — it is not graded or sent to the server.",
       prompts: [
-        "Think of something you bought or sold because of a feeling or a tip. Which piece of information would have changed your decision?",
+        "If you had to explain trading to a friend in one sentence, what would you say now?",
       ],
     },
     {
       kind: "summary",
-      id: "tf-l1-b9",
-      title: "Recap",
+      id: "tf-l1-b10",
+      title: "MISSION COMPLETE",
       points: [
-        "Every trade matches a buyer with a seller who accepted the same price for opposite reasons.",
-        "Trading transfers risk; it does not remove it. You are paid for taking risk carefully, not for being right.",
-        "Trading and investing differ by intent and time horizon, not by the tool you use.",
-        "Nothing is a good trade until you know where you are wrong and what that costs.",
+        "A filled trade connects two sides that accepted the same price for their own reasons.",
+        "Trading transfers price risk; it does not remove it.",
+        "Trading and investing can use the same markets and tools but differ in intent and time horizon.",
+        "A strong decision starts with a reason, an idea of what could go wrong and an understanding of the consequences.",
       ],
       nextStep:
-        "Next up: where prices actually come from — exchanges, order books and the participants behind every quote.",
+        "Next mission: discover where prices actually come from — exchanges, order books and the participants behind every quote.",
     },
   ],
 };
