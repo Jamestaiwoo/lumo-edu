@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { ACHIEVEMENTS } from "@/content/curriculum";
 import { calculateMastery, rankTopicsForReview, type TopicMasteryRecord } from "./mastery";
 import { completeLesson, type CompleteLessonResult, type SubmittedAnswer } from "./progress.functions";
-import { closeTrade, getPaperAccount, openTrade } from "./trading.functions";
+import { closeTrade, getMarketChart, getPaperAccount, openTrade } from "./trading.functions";
 
 export type Profile = {
   id: string;
@@ -217,6 +217,19 @@ export function useTrades() {
       if (error) throw error;
       return (data ?? []) as unknown as Trade[];
     },
+  });
+}
+
+
+
+export function useMarketChart(symbol: string, interval: "5min" | "15min" | "1h" | "1day" | "1week") {
+  const load = useServerFn(getMarketChart);
+  return useQuery({
+    queryKey: ["market-chart", symbol, interval],
+    queryFn: () => load({ data: { symbol, interval } }),
+    staleTime: 30_000,
+    refetchInterval: 60_000,
+    enabled: Boolean(symbol),
   });
 }
 
