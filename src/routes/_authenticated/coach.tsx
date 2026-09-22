@@ -44,6 +44,7 @@ function CoachPage() {
   const bottom = useRef<HTMLDivElement>(null);
   const [history, setHistory] = useState<Chat[]>([]);
   const [activeChatId, setActiveChatId] = useState<string | null>(null);
+  const [historyLoaded, setHistoryLoaded] = useState(false);
 
   const [messages, setMessages] = useState<Msg[]>([
     {
@@ -63,17 +64,19 @@ function CoachPage() {
       if (raw) setHistory(JSON.parse(raw) as Chat[]);
     } catch {
       // History is optional and should never block the coach.
+    } finally {
+      setHistoryLoaded(true);
     }
   }, [profile?.id]);
 
   useEffect(() => {
-    if (!profile?.id) return;
+    if (!profile?.id || !historyLoaded) return;
     try {
       window.localStorage.setItem(`${STORAGE_KEY}:${profile.id}`, JSON.stringify(history.slice(0, 30)));
     } catch {
       // Keep the live chat usable if storage is unavailable.
     }
-  }, [history, profile?.id]);
+  }, [history, historyLoaded, profile?.id]);
 
   function startNewChat() {
     setActiveChatId(null);
