@@ -27,6 +27,7 @@ export const lesson01WhatIsTrading: CourseLesson = {
           "When you buy an asset, somebody else is willing to sell it to you at the agreed price. Your order is matched with another participant's order, and the position transfers from one side to the other.",
           "That other participant may be another trader, a market maker, a fund, or someone trading for a completely different reason. They are not required to agree with your view of the future.",
           "This is why trading is an exchange of risk. If you buy, you take exposure to the asset's price moving against you. If you sell, you give up that exposure in exchange for cash or another position.",
+          "Trading also has friction: spreads, commissions, fees and slippage can reduce returns. The more often you trade, the more those costs can accumulate, so frequent trading needs a strong reason to overcome them.",
         ],
         keyTerms: [
           {
@@ -45,7 +46,7 @@ export const lesson01WhatIsTrading: CourseLesson = {
           },
           {
             term: "Counterparty",
-            definition: "The participant or liquidity provider on the other side of your trade.",
+            definition: "The participant or liquidity provider on the other side of your trade; in some markets, clearing systems stand between the two participants.",
           },
         ],
         callouts: [
