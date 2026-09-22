@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
+import { Brain, ChartNoAxesCombined, BookOpenCheck, ShieldCheck } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { Disclaimer } from "@/components/Disclaimer";
 import { WeakDrill } from "@/components/practice/WeakDrill";
