@@ -1,7 +1,6 @@
 import type { ReactNode } from "react";
 import { Flame, Zap } from "lucide-react";
 import { BottomNav } from "./BottomNav";
-import { LumoLogo } from "./LumoLogo";
 import { useProfile } from "@/lib/api";
 import { levelFromXp } from "@/lib/game";
 
@@ -24,7 +23,7 @@ export function AppShell({
       <header className="sticky top-0 z-30 border-b border-border/60 bg-background/85 backdrop-blur">
         <div className="mx-auto flex max-w-md items-center justify-between gap-3 px-4 py-3">
           <div className="flex min-w-0 items-center gap-2.5">
-            <LumoLogo className="size-8" />
+            <div aria-label="Lumo" className="shrink-0 text-[1.05rem] font-black tracking-[-0.07em] text-foreground" style={{ fontFamily: '"Gramatika", "Space Grotesk", sans-serif' }}>Lumo</div>
             <div className="min-w-0">
               <h1 className="truncate text-lg font-bold">{title}</h1>
               {subtitle ? <p className="truncate text-xs text-muted-foreground">{subtitle}</p> : null}
