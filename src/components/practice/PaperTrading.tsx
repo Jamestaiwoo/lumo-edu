@@ -81,7 +81,7 @@ export function PaperTrading() {
 
   const openPnl = openTrades.reduce((sum, trade) => {
     const quote = livePrices.data?.[trade.symbol];
-    if (!quote?.live) return sum;
+    if (!quote || quote.price <= 0) return sum;
     return sum + pnlFor(trade.side, Number(trade.quantity), Number(trade.entry_price), Number(quote.price));
   }, 0);
 
@@ -89,8 +89,8 @@ export function PaperTrading() {
   const wins = closedTrades.filter((trade) => Number(trade.pnl ?? 0) > 0).length;
 
   async function placeTrade() {
-    if (!market.data?.live) {
-      toast.error("Live market data is required before placing a paper trade.");
+    if (!market.data?.price || market.data.price <= 0) {
+      toast.error("A market price is unavailable right now. Try again in a moment.");
       return;
     }
 
@@ -324,9 +324,9 @@ export function PaperTrading() {
           <Button
             className="h-12 w-full font-bold"
             onClick={placeTrade}
-            disabled={open.isPending || !market.data?.live || price <= 0}
+            disabled={open.isPending || price <= 0}
           >
-            {open.isPending ? "Placing…" : !market.data?.live ? "Connect market data to trade" : `Place simulated ${side}`}
+            {open.isPending ? "Placing…" : `Place simulated ${side}`}
           </Button>
           <p className="text-center text-[11px] text-muted-foreground">
             Max {MAX_OPEN_POSITIONS} open practice positions · risk capped at 5% per trade
@@ -343,7 +343,7 @@ export function PaperTrading() {
             {openTrades.map((trade) => {
               const quote = livePrices.data?.[trade.symbol];
               const current = quote?.price ?? Number(trade.entry_price);
-              const pnl = quote?.live
+              const pnl = quote && quote.price > 0
                 ? pnlFor(trade.side, Number(trade.quantity), Number(trade.entry_price), Number(current))
                 : 0;
               return (
@@ -360,9 +360,13 @@ export function PaperTrading() {
                     </div>
                     <div className="text-right">
                       <p className={`text-sm font-bold ${pnl >= 0 ? "text-success" : "text-destructive"}`}>
-                        {quote?.live ? (pnl >= 0 ? "+" : "") + money(pnl) : "—"}
+                        {quote && quote.price > 0 ? (pnl >= 0 ? "+" : "") + money(pnl) : "—"}
                       </p>
-                      <p className="text-xs text-muted-foreground">{quote?.live ? `now ${Number(current).toFixed(2)}` : "waiting for quote"}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {quote && quote.price > 0
+                          ? `now ${Number(current).toFixed(2)} · ${quote.live ? "provider" : "simulated"}`
+                          : "waiting for quote"}
+                      </p>
                     </div>
                   </div>
                   <Button
