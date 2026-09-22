@@ -7,7 +7,6 @@ import { Disclaimer } from "@/components/Disclaimer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { LumoLogo } from "@/components/LumoLogo";
 import { ErrorBanner, InlineSpinner } from "@/components/state/StateViews";
 
 export const Route = createFileRoute("/auth")({
@@ -135,7 +134,13 @@ function AuthPage() {
   return (
     <div className="min-h-screen bg-background">
       <div className="mx-auto flex min-h-screen max-w-md flex-col justify-center gap-6 px-5 py-10">
-        <LumoLogo className="size-14" showName />
+        <div
+          aria-label="Lumo"
+          className="text-4xl font-black tracking-[-0.08em] text-primary"
+          style={{ fontFamily: '"Gramatika", "Space Grotesk", sans-serif' }}
+        >
+          Lumo
+        </div>
         <div>
           <h1 className="text-3xl font-bold">{heading}</h1>
           <p className="mt-1 text-sm text-muted-foreground">
