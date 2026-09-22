@@ -337,7 +337,7 @@ export const lesson01WhatIsTrading: CourseLesson = {
     },
     {
       kind: "reflection",
-      id: "tf-l1-b8",
+      id: "tf-l1-b9",
       title: "BONUS · Lock in the lesson",
       helper:
         "One sentence is enough. This reflection stays in your browser — it is not graded or sent to the server.",
@@ -347,7 +347,7 @@ export const lesson01WhatIsTrading: CourseLesson = {
     },
     {
       kind: "summary",
-      id: "tf-l1-b9",
+      id: "tf-l1-b10",
       title: "MISSION COMPLETE",
       points: [
         "A filled trade connects two sides that accepted the same price for their own reasons.",
