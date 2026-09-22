@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { INSTRUMENTS, pnlFor } from "./market";
-import { getLiveMarketPrice, getMarketSnapshot, type MarketInterval } from "./market-data.server";
+import { getMarketSnapshot, type MarketInterval } from "./market-data.server";
 import { MAX_OPEN_POSITIONS, validateClose, validateOpen, type TradeSide } from "./scoring";
 
 export type PaperAccount = {
@@ -82,8 +82,9 @@ export const openTrade = createServerFn({ method: "POST" })
     if (!INSTRUMENTS.some((i) => i.symbol === data.symbol)) throw new Error("Unknown instrument.");
     
     // Fetch live price from Alpha Vantage
-    const price = await getLiveMarketPrice(data.symbol);
-    if (price <= 0) throw new Error("Price unavailable. Try again in a moment.");
+    const snapshot = await getMarketSnapshot(data.symbol, "1min");
+    const price = snapshot.price;
+    if (price <= 0) throw new Error("Market price unavailable. Try again in a moment.");
     
     const account = await ensureAccount(supabase, userId);
 
@@ -160,9 +161,12 @@ export const closeTrade = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     if (!trade) throw new Error("That position no longer exists.");
 
-    // Fetch live exit price
-    const exitPrice = await getLiveMarketPrice(trade.symbol);
-    if (exitPrice <= 0) throw new Error("Price unavailable. Try again in a moment.");
+    // Use the latest available market price. If the provider is unavailable,
+    // the market-data layer returns an explicitly labelled simulated price so
+    // paper trading remains usable without pretending it is live execution.
+    const snapshot = await getMarketSnapshot(trade.symbol, "1min");
+    const exitPrice = snapshot.price;
+    if (exitPrice <= 0) throw new Error("Market price unavailable. Try again in a moment.");
     
     const check = validateClose({ exitPrice, status: trade.status });
     if (!check.ok) throw new Error(check.error);
