@@ -298,6 +298,44 @@ export const lesson01WhatIsTrading: CourseLesson = {
       },
     },
     {
+      kind: "check",
+      id: "tf-l1-b8",
+      title: "KNOWLEDGE CHECK · Lock it in",
+      assessment: {
+        intro:
+          "Final check: can you separate a trading decision from the outcome it produces?",
+        items: [
+          {
+            skill: "Decision quality versus outcome",
+            question: {
+              id: "tf-l1-q5",
+              type: "mcq",
+              topic: "market-basics",
+              prompt:
+                "A trader follows a sensible plan, but the trade loses money. What is the best conclusion?",
+              options: [
+                "The plan was definitely bad because it lost",
+                "The plan was definitely good because it followed the rules",
+                "The result alone cannot judge the decision; review the reasoning and what happened",
+                "Trading is mostly luck, so the plan does not matter",
+              ],
+              answer: 2,
+              explain:
+                "A single outcome does not prove whether a decision was good or bad. Review the reasoning, assumptions, risk and what the market actually did.",
+            },
+            feedbackByAnswer: {
+              "0":
+                "Losses can happen even when a decision was reasonable. Judge the process separately from the outcome.",
+              "1":
+                "Following a process matters, but rules can still be flawed. Good decisions require reviewing the reasoning as well.",
+              "3":
+                "Uncertainty is real, but that does not make planning useless. A process helps you make and evaluate decisions consistently.",
+            },
+          },
+        ],
+      },
+    },
+    {
       kind: "reflection",
       id: "tf-l1-b8",
       title: "BONUS · Lock in the lesson",
