@@ -35,9 +35,8 @@ function normaliseSymbol(symbol: string) {
   return symbol.trim().toUpperCase();
 }
 
-function intervalForAsset(assetClass: MarketAssetClass, interval: MarketInterval) {
-  if (assetClass === "stock") return interval;
-  if (interval === "1day" || interval === "1week") return interval;
+function providerInterval(interval: MarketInterval): string {
+  if (interval === "1h" || interval === "4h") return "60min";
   return interval;
 }
 
@@ -126,7 +125,7 @@ function aggregateCandles(candles: Candle[], bucketHours: number): Candle[] {
 }
 
 async function fetchProviderCandles(symbol: string, assetClass: MarketAssetClass, interval: MarketInterval): Promise<Candle[]> {
-  const effectiveInterval = intervalForAsset(assetClass, interval === "4h" ? "1h" : interval);
+  const effectiveInterval = providerInterval(interval);
   let data: Record<string, unknown> | null;
 
   if (assetClass === "stock") {
@@ -192,7 +191,9 @@ async function fetchProviderCandles(symbol: string, assetClass: MarketAssetClass
 
 export async function getMarketSnapshot(symbolInput: string, interval: MarketInterval = "15min"): Promise<MarketSnapshot> {
   const symbol = normaliseSymbol(symbolInput);
-  const assetClass = getAssetClass(symbol);
+  const instrument = INSTRUMENTS.find((item) => item.symbol === symbol);
+  if (!instrument) throw new Error("Unsupported instrument.");
+  const assetClass = instrument.assetClass;
   const cacheKey = `${symbol}:${interval}`;
   const cached = cache.get(cacheKey);
   if (cached && cached.expiresAt > Date.now()) return cached.value;
