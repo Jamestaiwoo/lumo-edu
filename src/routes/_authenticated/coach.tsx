@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { Clock3, MessageSquarePlus, Send, Trash2 } from "lucide-react";
+import { Clock3, MessageSquarePlus, Search, Send, Trash2, X } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { Disclaimer } from "@/components/Disclaimer";
 import { Button } from "@/components/ui/button";
@@ -45,6 +45,8 @@ function CoachPage() {
   const [history, setHistory] = useState<Chat[]>([]);
   const [activeChatId, setActiveChatId] = useState<string | null>(null);
   const [historyLoaded, setHistoryLoaded] = useState(false);
+  const [historyOpen, setHistoryOpen] = useState(false);
+  const [historySearch, setHistorySearch] = useState("");
 
   const [messages, setMessages] = useState<Msg[]>([
     {
@@ -78,7 +80,10 @@ function CoachPage() {
     }
   }, [history, historyLoaded, profile?.id]);
 
+  const filteredHistory = history.filter((chat) => chat.title.toLowerCase().includes(historySearch.trim().toLowerCase()));
+
   function startNewChat() {
+    setHistoryOpen(false);
     setActiveChatId(null);
     setMessages([{ role: "assistant", content: "Hi! I explain concepts — I never tell you what to buy or sell. What would you like to understand today?" }]);
     setInput("");
@@ -86,6 +91,7 @@ function CoachPage() {
   }
 
   function openChat(chat: Chat) {
+    setHistoryOpen(false);
     setActiveChatId(chat.id);
     setMessages(chat.messages);
     setInput("");
@@ -149,14 +155,40 @@ function CoachPage() {
       <div className="flex flex-col gap-4">
         <div className="flex items-center justify-between gap-3">
           <div>
-            <p className="text-sm font-semibold">Coach conversations</p>
-            <p className="text-xs text-muted-foreground">Recent chats saved on this device.</p>
+            <p className="text-sm font-semibold">Lumo Coach</p>
+            <p className="text-xs text-muted-foreground">Learn concepts, test ideas, improve your decisions.</p>
           </div>
-          <Button type="button" variant="outline" size="sm" onClick={startNewChat}>
-            <MessageSquarePlus className="mr-2 size-4" aria-hidden />
-            New chat
-          </Button>
+          <div className="flex shrink-0 gap-2">
+            <Button type="button" variant="outline" size="sm" onClick={() => setHistoryOpen(true)}><Clock3 className="mr-2 size-4" aria-hidden />History{history.length > 0 ? ` (${history.length})` : ""}</Button>
+            <Button type="button" size="sm" onClick={startNewChat}><MessageSquarePlus className="mr-2 size-4" aria-hidden />New chat</Button>
+          </div>
         </div>
+
+        {historyOpen && (
+          <div className="fixed inset-0 z-50 flex items-end justify-center bg-background/70 p-3 backdrop-blur-sm sm:items-center">
+            <div className="flex max-h-[78vh] w-full max-w-lg flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-2xl">
+              <div className="flex items-center justify-between border-b border-border/60 p-4">
+                <div><p className="font-semibold">Chat history</p><p className="text-xs text-muted-foreground">Your saved coach conversations.</p></div>
+                <Button type="button" variant="ghost" size="icon" onClick={() => setHistoryOpen(false)} aria-label="Close history"><X className="size-4" /></Button>
+              </div>
+              <div className="border-b border-border/60 p-3">
+                <div className="relative"><Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" /><Input value={historySearch} onChange={(e) => setHistorySearch(e.target.value)} placeholder="Search conversations…" className="pl-9" /></div>
+              </div>
+              <div className="overflow-y-auto p-2">
+                {filteredHistory.length === 0 ? <div className="px-4 py-10 text-center text-sm text-muted-foreground">{history.length ? "No conversations match your search." : "Your conversations will appear here."}</div> : filteredHistory.map((chat) => (
+                  <div key={chat.id} className="flex items-center gap-2 rounded-xl p-2 hover:bg-muted/50">
+                    <button type="button" onClick={() => openChat(chat)} className="min-w-0 flex-1 rounded-lg px-2 py-2 text-left">
+                      <p className="truncate text-sm font-medium">{chat.title}</p>
+                      <p className="mt-1 flex items-center gap-1 text-[10px] text-muted-foreground"><Clock3 className="size-3" aria-hidden />{new Date(chat.updatedAt).toLocaleString()}</p>
+                    </button>
+                    <Button type="button" variant="ghost" size="icon" onClick={() => deleteChat(chat.id)} aria-label="Delete chat" className="shrink-0 text-muted-foreground hover:text-destructive"><Trash2 className="size-4" /></Button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
         {history.length > 0 && (
           <div className="flex gap-2 overflow-x-auto pb-1">
             {history.map((chat) => (
