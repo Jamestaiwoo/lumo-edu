@@ -4,7 +4,7 @@ import { AppShell } from "@/components/AppShell";
 import { Disclaimer } from "@/components/Disclaimer";
 import { useProgress, useTopicStats, type LessonProgress } from "@/lib/api";
 import { ErrorState, LoadingState } from "@/components/state/StateViews";
-import { LESSON_ORDER, TOPIC_LABELS, WORLDS } from "@/content/curriculum";
+import { LESSON_ORDER, TOPIC_LABELS } from "@/content/curriculum";
 import { COURSES, courseLessons } from "@/content/course";
 import { getLessonForTopic, getRecommendedLesson } from "@/lib/recommendation";
 
@@ -14,7 +14,7 @@ export const Route = createFileRoute("/_authenticated/learn/")({
       { title: "Learning path — Lumo" },
       {
         name: "description",
-        content: "Three worlds of bite-sized trading lessons, unlocked one step at a time.",
+        content: "Structured trading courses with bite-sized lessons, unlocked one step at a time.",
       },
       { property: "og:title", content: "Learning path — Lumo" },
       {
@@ -216,97 +216,6 @@ function LearnPath() {
             </section>
           );
         })}
-        <p className="text-[11px] uppercase tracking-wide text-muted-foreground">
-          Legacy question-first lessons
-        </p>
-        {WORLDS.map((world, wi) => (
-          <section key={world.id}>
-            <div className="mb-4 flex items-baseline justify-between">
-              <div>
-                <p className="text-[11px] uppercase tracking-wide text-muted-foreground">
-                  World {wi + 1}
-                </p>
-                <h2 className="text-lg font-bold">{world.title}</h2>
-                <p className="text-xs text-muted-foreground">{world.subtitle}</p>
-              </div>
-              <span className="text-xs font-semibold text-muted-foreground">
-                {world.lessons.filter((l) => doneMap.has(l.id)).length}/{world.lessons.length}
-              </span>
-            </div>
-
-            <ol className="relative flex flex-col gap-3">
-              {world.lessons.map((lesson, li) => {
-                const idx = LESSON_ORDER.indexOf(lesson.id);
-                const done = doneMap.get(lesson.id);
-                const locked = idx > unlockedIndex;
-                const offset = li % 2 === 0 ? "ml-0" : "ml-8";
-
-                const inner = (
-                  <div
-                    className={`flex w-full items-center gap-3 rounded-2xl border p-3.5 transition ${
-                      locked
-                        ? "border-border/40 bg-card/40 opacity-60"
-                        : done
-                          ? "border-success/40 bg-card"
-                          : "border-primary/50 bg-card glow-primary"
-                    }`}
-                  >
-                    <span
-                      className={`flex size-11 shrink-0 items-center justify-center rounded-2xl ${
-                        locked
-                          ? "bg-secondary text-muted-foreground"
-                          : done
-                            ? "bg-success text-success-foreground"
-                            : "bg-primary text-primary-foreground"
-                      }`}
-                    >
-                      {locked ? (
-                        <Lock className="size-4" aria-hidden />
-                      ) : done ? (
-                        <Check className="size-5" aria-hidden />
-                      ) : (
-                        <Play className="size-4 fill-current" aria-hidden />
-                      )}
-                    </span>
-                    <span className="min-w-0 flex-1">
-                      <span className="block truncate text-sm font-bold">{lesson.title}</span>
-                      <span className="block truncate text-xs text-muted-foreground">
-                        {lesson.blurb}
-                      </span>
-                    </span>
-                    {done ? (
-                      <span className="flex shrink-0 items-center gap-1 text-xs font-semibold text-success">
-                        <Star className="size-3.5 fill-current" aria-hidden />
-                        {done.best_score}/{lesson.questions.length}
-                      </span>
-                    ) : (
-                      <span className="shrink-0 text-xs font-semibold text-muted-foreground">
-                        +{lesson.xp} XP
-                      </span>
-                    )}
-                  </div>
-                );
-
-                return (
-                  <li key={lesson.id} className={offset}>
-                    {locked ? (
-                      <div aria-disabled>{inner}</div>
-                    ) : (
-                      <Link
-                        to="/learn/$lessonId"
-                        params={{ lessonId: lesson.id }}
-                        className="block active:scale-[0.99]"
-                      >
-                        {inner}
-                      </Link>
-                    )}
-                  </li>
-                );
-              })}
-            </ol>
-          </section>
-        ))}
-
         <Disclaimer />
       </div>
     </AppShell>
