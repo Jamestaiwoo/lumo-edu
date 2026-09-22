@@ -1,5 +1,3 @@
-import "server-only";
-
 import { INSTRUMENTS, type AssetClass } from "./market";
 
 export type MarketAssetClass = AssetClass;
