@@ -5,7 +5,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { EmptyState, ErrorBanner, ErrorState, LoadingState } from "@/components/state/StateViews";
-import { INSTRUMENTS, pnlFor, type AssetClass } from "@/lib/market";
+import {
+  formatMarketPrice,
+  INSTRUMENTS,
+  pnlFor,
+  riskPerUnitInAccountCurrency,
+  type AssetClass,
+} from "@/lib/market";
 import { money } from "@/lib/game";
 import { MAX_OPEN_POSITIONS } from "@/lib/scoring";
 import {
@@ -75,14 +81,14 @@ export function PaperTrading() {
   const stopNum = Number(stop) || 0;
   const takeNum = Number(take) || 0;
   const riskAmount = (balance * (Number(riskPct) || 0)) / 100;
-  const distanceToStop = stopNum > 0 ? Math.abs(price - stopNum) : 0;
-  const qty = distanceToStop > 0 ? Math.floor(riskAmount / distanceToStop) : 0;
+  const riskPerUnit = stopNum > 0 ? riskPerUnitInAccountCurrency(symbol, price, stopNum) : 0;
+  const qty = riskPerUnit > 0 ? Math.floor(riskAmount / riskPerUnit) : 0;
   const selectedInstrument = INSTRUMENTS.find((instrument) => instrument.symbol === symbol);
 
   const openPnl = openTrades.reduce((sum, trade) => {
     const quote = livePrices.data?.[trade.symbol];
     if (!quote || quote.price <= 0) return sum;
-    return sum + pnlFor(trade.side, Number(trade.quantity), Number(trade.entry_price), Number(quote.price));
+    return sum + pnlFor(trade.side, Number(trade.quantity), Number(trade.entry_price), Number(quote.price), trade.symbol);
   }, 0);
 
   const realised = closedTrades.reduce((sum, trade) => sum + Number(trade.pnl ?? 0), 0);
@@ -104,7 +110,7 @@ export function PaperTrading() {
       });
       setStop("");
       setTake("");
-      toast.success(`Simulated ${res.side} ${res.quantity} ${res.symbol} @ ${res.entryPrice.toFixed(2)}`);
+      toast.success(`Simulated ${res.side} ${res.quantity} ${res.symbol} @ ${formatMarketPrice(res.symbol, res.entryPrice)}`);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Could not place that trade.");
     }
@@ -229,7 +235,7 @@ export function PaperTrading() {
               </div>
               <div className="text-right">
                 <p className="text-2xl font-bold tabular-nums">
-                  {price > 0 ? price.toLocaleString(undefined, { maximumFractionDigits: price < 10 ? 5 : 2 }) : "—"}
+                  {formatMarketPrice(symbol, price)}
                 </p>
                 <p className="text-[10px] text-muted-foreground">{market.data?.live ? "latest available" : "simulated"}</p>
               </div>
@@ -267,7 +273,7 @@ export function PaperTrading() {
             </div>
 
             <div className="mt-3 grid grid-cols-3 gap-2">
-              <Metric label="Last" value={price > 0 ? price.toLocaleString(undefined, { maximumFractionDigits: price < 10 ? 5 : 2 }) : "—"} />
+              <Metric label="Last" value={formatMarketPrice(symbol, price)} />
               <Metric label="SMA 20" value={formatMetric(sma(candles, 20))} />
               <Metric label="RSI 14" value={formatMetric(rsi(candles, 14))} />
             </div>
@@ -303,7 +309,7 @@ export function PaperTrading() {
             label="Stop loss"
             value={stop}
             onChange={setStop}
-            placeholder={price > 0 ? (price * (side === "long" ? 0.97 : 1.03)).toFixed(price < 10 ? 5 : 2) : "price"}
+            placeholder={price > 0 ? formatMarketPrice(symbol, price * (side === "long" ? 0.97 : 1.03)) : "price"}
           />
           <Field label="Take profit" value={take} onChange={setTake} placeholder="optional" />
         </div>
@@ -354,8 +360,8 @@ export function PaperTrading() {
                         {trade.symbol} <span className="text-xs font-medium capitalize text-muted-foreground">{trade.side}</span>
                       </p>
                       <p className="text-xs text-muted-foreground">
-                        {Number(trade.quantity).toLocaleString()} @ {Number(trade.entry_price).toFixed(2)} · stop{" "}
-                        {trade.stop_loss ? Number(trade.stop_loss).toFixed(2) : "—"}
+                        {Number(trade.quantity).toLocaleString()} @ {formatMarketPrice(trade.symbol, Number(trade.entry_price))} · stop{" "}
+                        {trade.stop_loss ? formatMarketPrice(trade.symbol, Number(trade.stop_loss)) : "—"}
                       </p>
                     </div>
                     <div className="text-right">

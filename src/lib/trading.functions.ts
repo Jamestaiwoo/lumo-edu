@@ -96,6 +96,7 @@ export const openTrade = createServerFn({ method: "POST" })
     if (countErr) throw new Error(countErr.message);
 
     const check = validateOpen({
+      symbol: data.symbol,
       side: data.side,
       price,
       stopLoss: data.stopLoss,
@@ -171,7 +172,13 @@ export const closeTrade = createServerFn({ method: "POST" })
     const check = validateClose({ exitPrice, status: trade.status });
     if (!check.ok) throw new Error(check.error);
 
-    const pnl = pnlFor(trade.side, Number(trade.quantity), Number(trade.entry_price), exitPrice);
+    const pnl = pnlFor(
+      trade.side,
+      Number(trade.quantity),
+      Number(trade.entry_price),
+      exitPrice,
+      trade.symbol,
+    );
 
     const { error: updErr, count } = await supabase
       .from("paper_trades")

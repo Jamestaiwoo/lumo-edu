@@ -24,9 +24,39 @@ export const INSTRUMENTS: Instrument[] = [
   { symbol: "XRP/USD", name: "XRP / US Dollar", assetClass: "crypto" },
 ];
 
-export function pnlFor(side: string, qty: number, entry: number, current: number) {
+export function quoteToUsdMultiplier(symbol: string, price: number) {
+  if (!Number.isFinite(price) || price <= 0) return 1;
+  const instrument = INSTRUMENTS.find((item) => item.symbol === symbol);
+  if (!instrument || instrument.assetClass !== "forex") return 1;
+
+  const [, quote] = symbol.split("/");
+  return quote === "USD" ? 1 : 1 / price;
+}
+
+export function riskPerUnitInAccountCurrency(symbol: string, price: number, stopLoss: number) {
+  return Math.abs(price - stopLoss) * quoteToUsdMultiplier(symbol, price);
+}
+
+export function pnlFor(side: string, qty: number, entry: number, current: number, symbol?: string) {
   const dir = side === "short" ? -1 : 1;
-  return +((current - entry) * qty * dir).toFixed(2);
+  const multiplier = symbol ? quoteToUsdMultiplier(symbol, current) : 1;
+  return +((current - entry) * qty * dir * multiplier).toFixed(2);
+}
+
+export function marketPriceDecimals(symbol: string) {
+  const instrument = INSTRUMENTS.find((item) => item.symbol === symbol);
+  if (instrument?.assetClass === "forex") {
+    return symbol.includes("JPY") ? 3 : 5;
+  }
+  return instrument?.assetClass === "crypto" ? 4 : 2;
+}
+
+export function formatMarketPrice(symbol: string, price: number) {
+  if (!Number.isFinite(price) || price <= 0) return "—";
+  return price.toLocaleString(undefined, {
+    minimumFractionDigits: marketPriceDecimals(symbol),
+    maximumFractionDigits: marketPriceDecimals(symbol),
+  });
 }
 
 export function getBidAsk(price: number, _symbol?: string) {

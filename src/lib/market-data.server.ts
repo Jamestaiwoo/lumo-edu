@@ -193,8 +193,26 @@ function parseAlphaVantageSeries(data: Record<string, unknown>): Candle[] {
     .sort((a, b) => a.time.localeCompare(b.time));
 }
 
+const SYNTHETIC_BASE_PRICES: Record<string, number> = {
+  AAPL: 240,
+  MSFT: 510,
+  NVDA: 180,
+  TSLA: 350,
+  AMZN: 230,
+  GOOGL: 250,
+  "EUR/USD": 1.17,
+  "GBP/USD": 1.35,
+  "USD/JPY": 148,
+  "USD/CHF": 0.80,
+  "BTC/USD": 110_000,
+  "ETH/USD": 4_000,
+  "SOL/USD": 200,
+  "BNB/USD": 900,
+  "XRP/USD": 3,
+};
+
 function makeSyntheticSeries(symbol: string, points = 80): Candle[] {
-  const base = symbol === "AAPL" ? 150 : symbol === "BTC/USD" ? 60_000 : symbol.includes("/") ? 1 : 100;
+  const base = SYNTHETIC_BASE_PRICES[symbol] ?? 100;
   let price = base;
   const now = Date.now();
   const seed = [...symbol].reduce((sum, char) => sum + char.charCodeAt(0), 0);
