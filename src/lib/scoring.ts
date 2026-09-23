@@ -116,7 +116,7 @@ export function validateOpen(input: OpenTradeCheck): ValidationResult<{
 
   return {
     ok: true,
-    value: { quantity, riskAmount: +(quantity * perShare).toFixed(2), notional },
+    value: { quantity, riskAmount: +(quantity * perUnitRisk).toFixed(2), notional },
   };
 }
 
