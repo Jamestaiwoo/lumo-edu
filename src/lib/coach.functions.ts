@@ -1,5 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import type { SupabaseClient } from "@supabase/supabase-js";
+import type { Database } from "@/integrations/supabase/types";
 import { TOPIC_LABELS } from "@/content/curriculum";
 
 type Msg = { role: "user" | "assistant"; content: string };
@@ -25,7 +27,7 @@ function normalizeMessages(messages: Msg[]) {
     .filter((m) => m.content.length > 0) as Msg[];
 }
 
-async function learnerContext(supabase: Awaited<ReturnType<typeof requireSupabaseAuth>> extends never ? never : any, userId: string) {
+async function learnerContext(supabase: SupabaseClient<Database>, userId: string) {
   const [profileResult, progressResult, attemptsResult, tradesResult] = await Promise.all([
     supabase
       .from("profiles")
