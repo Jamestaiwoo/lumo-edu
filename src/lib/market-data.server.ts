@@ -254,6 +254,28 @@ async function fetchJson(url: URL, headers?: HeadersInit): Promise<Record<string
   return data;
 }
 
+/**
+ * Fetch the provider's current quote separately from historical candles.
+ *
+ * We previously used the last candle close as the "current" price. That can
+ * become stale when a provider's intraday series lags behind its live quote.
+ * Twelve Data exposes a dedicated latest-price endpoint for this purpose.
+ */
+async function fetchTwelveDataLatestPrice(symbol: string): Promise<number> {
+  if (!TWELVE_DATA_API_KEY) throw new Error("Twelve Data API key is not configured.");
+
+  const url = new URL(`${TWELVE_DATA_BASE}/price`);
+  url.searchParams.set("symbol", symbol);
+  url.searchParams.set("apikey", TWELVE_DATA_API_KEY);
+  url.searchParams.set("dp", "8");
+
+  const data = await fetchJson(url);
+  const price = parseNumber(data.price);
+  if (price == null || price <= 0) throw new Error("Twelve Data returned an invalid latest price.");
+
+  return price;
+}
+
 async function fetchTwelveData(symbol: string, interval: MarketInterval): Promise<Candle[]> {
   if (!TWELVE_DATA_API_KEY) throw new Error("Twelve Data API key is not configured.");
 
@@ -348,6 +370,7 @@ async function fetchAlphaVantage(symbol: string, assetClass: MarketAssetClass, i
 type ProviderFetcher = {
   provider: Exclude<MarketProvider, "simulated">;
   fetch: () => Promise<Candle[]>;
+  fetchLatestPrice?: () => Promise<number>;
 };
 
 function providerOrder(
@@ -357,15 +380,32 @@ function providerOrder(
 ): ProviderFetcher[] {
   if (assetClass === "crypto") {
     return [
-      { provider: "coingecko", fetch: () => fetchCoinGecko(symbol, interval) },
-      { provider: "twelve-data", fetch: () => fetchTwelveData(symbol, interval) },
-      { provider: "alpha-vantage", fetch: () => fetchAlphaVantage(symbol, assetClass, interval) },
+      {
+        provider: "coingecko",
+        fetch: () => fetchCoinGecko(symbol, interval),
+      },
+      {
+        provider: "twelve-data",
+        fetch: () => fetchTwelveData(symbol, interval),
+        fetchLatestPrice: () => fetchTwelveDataLatestPrice(symbol),
+      },
+      {
+        provider: "alpha-vantage",
+        fetch: () => fetchAlphaVantage(symbol, assetClass, interval),
+      },
     ];
   }
 
   return [
-    { provider: "twelve-data", fetch: () => fetchTwelveData(symbol, interval) },
-    { provider: "alpha-vantage", fetch: () => fetchAlphaVantage(symbol, assetClass, interval) },
+    {
+      provider: "twelve-data",
+      fetch: () => fetchTwelveData(symbol, interval),
+      fetchLatestPrice: () => fetchTwelveDataLatestPrice(symbol),
+    },
+    {
+      provider: "alpha-vantage",
+      fetch: () => fetchAlphaVantage(symbol, assetClass, interval),
+    },
   ];
 }
 
@@ -373,11 +413,27 @@ async function fetchWithFallback(
   symbol: string,
   assetClass: MarketAssetClass,
   interval: MarketInterval,
-): Promise<{ provider: Exclude<MarketProvider, "simulated">; candles: Candle[] } | null> {
+): Promise<{
+  provider: Exclude<MarketProvider, "simulated">;
+  candles: Candle[];
+  latestPrice: number | null;
+} | null> {
   for (const candidate of providerOrder(symbol, assetClass, interval)) {
     try {
       const candles = await candidate.fetch();
-      if (candles.length > 0) return { provider: candidate.provider, candles };
+      if (candles.length === 0) continue;
+
+      let latestPrice = candles[candles.length - 1]!.close;
+
+      if (candidate.fetchLatestPrice) {
+        try {
+          latestPrice = await candidate.fetchLatestPrice();
+        } catch (error) {
+          console.warn(`[Market] ${candidate.provider} latest quote failed; using candle close:`, error);
+        }
+      }
+
+      return { provider: candidate.provider, candles, latestPrice };
     } catch (error) {
       console.warn(`[Market] ${candidate.provider} failed:`, error);
     }
@@ -402,7 +458,7 @@ export async function getMarketSnapshot(
   if (result) {
     const value: MarketSnapshot = {
       symbol,
-      price: result.candles[result.candles.length - 1]!.close,
+      price: result.latestPrice,
       candles: result.candles.slice(-100),
       live: true,
       provider: result.provider,
