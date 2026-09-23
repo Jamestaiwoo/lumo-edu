@@ -43,6 +43,22 @@ export function pnlFor(side: string, qty: number, entry: number, current: number
   return +((current - entry) * qty * dir * multiplier).toFixed(2);
 }
 
+export function marketPriceDecimals(symbol: string) {
+  const instrument = INSTRUMENTS.find((item) => item.symbol === symbol);
+  if (instrument?.assetClass === "forex") {
+    return symbol.includes("JPY") ? 3 : 5;
+  }
+  return instrument?.assetClass === "crypto" ? 4 : 2;
+}
+
+export function formatMarketPrice(symbol: string, price: number) {
+  if (!Number.isFinite(price) || price <= 0) return "—";
+  return price.toLocaleString(undefined, {
+    minimumFractionDigits: marketPriceDecimals(symbol),
+    maximumFractionDigits: marketPriceDecimals(symbol),
+  });
+}
+
 export function getBidAsk(price: number, _symbol?: string) {
   const spread = +(price * 0.0005).toFixed(6);
   return {
