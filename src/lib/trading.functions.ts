@@ -96,6 +96,7 @@ export const openTrade = createServerFn({ method: "POST" })
     if (countErr) throw new Error(countErr.message);
 
     const check = validateOpen({
+      symbol: data.symbol,
       side: data.side,
       price,
       stopLoss: data.stopLoss,
