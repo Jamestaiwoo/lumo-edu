@@ -46,8 +46,24 @@ ALTER TABLE public.coach_messages ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "own coach messages"
   ON public.coach_messages
   FOR ALL TO authenticated
-  USING (auth.uid() = user_id)
-  WITH CHECK (auth.uid() = user_id);
+  USING (
+    auth.uid() = user_id
+    AND EXISTS (
+      SELECT 1
+      FROM public.coach_conversations c
+      WHERE c.id = conversation_id
+        AND c.user_id = auth.uid()
+    )
+  )
+  WITH CHECK (
+    auth.uid() = user_id
+    AND EXISTS (
+      SELECT 1
+      FROM public.coach_conversations c
+      WHERE c.id = conversation_id
+        AND c.user_id = auth.uid()
+    )
+  );
 
 CREATE OR REPLACE FUNCTION public.touch_coach_conversation()
 RETURNS TRIGGER
