@@ -1,3 +1,5 @@
+import { quoteToUsdMultiplier, riskPerUnitInAccountCurrency } from "./market";
+
 /**
  * Pure, shared scoring + trade-validation rules.
  * Used by the server functions (authoritative) and by unit tests.
@@ -101,7 +103,6 @@ export function validateOpen(input: OpenTradeCheck): ValidationResult<{
     return { ok: false, error: "Your practice account has no buying power left." };
 
   const riskBudget = (balance * riskPct) / 100;
-  const { riskPerUnitInAccountCurrency } = require("./market") as typeof import("./market");
   const perUnitRisk = riskPerUnitInAccountCurrency(input.symbol ?? "", price, stopLoss);
   if (!Number.isFinite(perUnitRisk) || perUnitRisk <= 0)
     return { ok: false, error: "Could not calculate the risk for this market." };
@@ -110,7 +111,6 @@ export function validateOpen(input: OpenTradeCheck): ValidationResult<{
   if (quantity < 1)
     return { ok: false, error: "That risk gives less than one unit. Widen risk or tighten the stop." };
 
-  const { quoteToUsdMultiplier } = require("./market") as typeof import("./market");
   const notional = +(quantity * price * quoteToUsdMultiplier(input.symbol ?? "", price)).toFixed(2);
   if (notional > balance) return { ok: false, error: "Not enough buying power for that position size." };
 
