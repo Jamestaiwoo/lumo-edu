@@ -14,8 +14,19 @@ import {
   nextLessonIdInTrack,
   trackOfLesson,
 } from "../recommendation";
-import { evaluateRaw, feedbackForAnswer, buildSubmission, submittedRaw } from "../lesson-feedback";
+import {
+  evaluateRaw,
+  feedbackForAnswer,
+  buildSubmission,
+  assessmentLocked,
+  submittedRaw,
+} from "../lesson-feedback";
 import { simulateOrder } from "../order-simulation";
+import {
+  validatePositionSizeInput,
+  validateTradePlanInput,
+  type TradePlanInput,
+} from "../interaction-validation";
 
 describe("lesson resolver", () => {
   it("still resolves every legacy lesson exactly as before", () => {
@@ -263,6 +274,94 @@ describe("order type simulator", () => {
     });
     expect(outcome.status).toBe("unfilled");
     expect(outcome.headline).toMatch(/no limit price/i);
+  });
+
+  it("rejects nonsensical limit prices instead of waiting for the impossible", () => {
+    for (const limitPrice of [0, -5, NaN]) {
+      const outcome = simulateOrder({
+        type: "limit",
+        side: "buy",
+        bid: 20.15,
+        ask: 20.16,
+        ticks,
+        limitPrice,
+      });
+      expect(outcome.status, `limit ${limitPrice}`).toBe("unfilled");
+      expect(outcome.headline, `limit ${limitPrice}`).toMatch(/cannot trade/i);
+      expect(outcome.detail, `limit ${limitPrice}`).toMatch(/positive price/i);
+    }
+  });
+});
+
+describe("assessment lock mapping", () => {
+  it("locks while a submission is pending and after it succeeds, editable otherwise", () => {
+    expect(assessmentLocked({ done: false, pending: false })).toBe(false);
+    expect(assessmentLocked({ done: false, pending: true })).toBe(true);
+    expect(assessmentLocked({ done: true, pending: false })).toBe(true);
+    expect(assessmentLocked({ done: true, pending: true })).toBe(true);
+  });
+});
+
+describe("interaction input validation", () => {
+  const coherentLong: TradePlanInput = {
+    direction: "long",
+    entry: 100,
+    stop: 95,
+    target: 110,
+    riskPct: 1,
+  };
+
+  it("rejects zero and negative risk", () => {
+    expect(validatePositionSizeInput({ balance: 1000, entry: 50, stop: 48, riskPct: 0 }).ok).toBe(
+      false,
+    );
+    expect(validateTradePlanInput({ ...coherentLong, riskPct: -1 }).ok).toBe(false);
+  });
+
+  it("rejects a stop equal to the entry in the position-size builder", () => {
+    const result = validatePositionSizeInput({ balance: 1000, entry: 50, stop: 50, riskPct: 1 });
+    expect(result.ok).toBe(false);
+    expect(result.message).toMatch(/distance/i);
+  });
+
+  it("rejects a take-profit below entry for a long plan", () => {
+    const result = validateTradePlanInput({ ...coherentLong, target: 90 });
+    expect(result.ok).toBe(false);
+    expect(result.message).toMatch(/target sits above entry/i);
+  });
+
+  it("rejects a stop above entry for a long plan", () => {
+    const result = validateTradePlanInput({ ...coherentLong, stop: 105 });
+    expect(result.ok).toBe(false);
+    expect(result.message).toMatch(/stop sits below entry/i);
+  });
+
+  it("mirrors the coherence rules for shorts", () => {
+    const short = { direction: "short", entry: 100, stop: 105, target: 90, riskPct: 1 };
+    expect(validateTradePlanInput(short).ok).toBe(true);
+    expect(validateTradePlanInput({ ...short, stop: 95 }).ok).toBe(false);
+    expect(validateTradePlanInput({ ...short, target: 110 }).ok).toBe(false);
+  });
+
+  it("caps risk at five percent", () => {
+    expect(validatePositionSizeInput({ balance: 1000, entry: 50, stop: 48, riskPct: 6 }).ok).toBe(
+      false,
+    );
+    expect(validateTradePlanInput({ ...coherentLong, riskPct: 7 }).ok).toBe(false);
+  });
+
+  it("rejects non-positive balances and prices", () => {
+    expect(validatePositionSizeInput({ balance: 0, entry: 50, stop: 48, riskPct: 1 }).ok).toBe(
+      false,
+    );
+    expect(validateTradePlanInput({ ...coherentLong, entry: -5 }).ok).toBe(false);
+    expect(validateTradePlanInput({ ...coherentLong, entry: NaN }).ok).toBe(false);
+  });
+
+  it("passes coherent input straight through", () => {
+    const size = validatePositionSizeInput({ balance: 1000, entry: 50, stop: 48, riskPct: 1 });
+    expect(size).toEqual({ ok: true, message: null });
+    expect(validateTradePlanInput(coherentLong)).toEqual({ ok: true, message: null });
   });
 });
 

@@ -80,3 +80,12 @@ export function scoreAnswers(
   }).length;
   return { correct, total: questions.length };
 }
+
+/**
+ * Whether assessment blocks should be non-interactive: while a completion
+ * submission is in flight and after it succeeds (the graded record is fixed
+ * at that point; the local "Check answers" flow is formative only).
+ */
+export function assessmentLocked(state: { done: boolean; pending: boolean }): boolean {
+  return state.done || state.pending;
+}

@@ -196,9 +196,14 @@ export function AssessmentBlockView({
       ) : null}
       {locked ? (
         <p className="mt-2 text-[11px] text-muted-foreground">
-          Locked in for grading. Your answers above feed the lesson result.
+          Locked while your lesson is being graded.
         </p>
-      ) : null}
+      ) : (
+        <p className="mt-2 text-[11px] text-muted-foreground">
+          Practice only — checking answers here records nothing. Finishing the lesson grades your
+          final answers once.
+        </p>
+      )}
     </BlockCard>
   );
 }

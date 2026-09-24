@@ -276,7 +276,7 @@ export const lesson04BidAskSpread: CourseLesson = {
                   "You are not in a hurry and the spread is a meaningful fraction of the move you are targeting. A patient limit order converts your patience into a better entry price.",
               },
               feedbackByAnswer: {
-                "0": "Ten cents of spread on 400 shares is $40 — the same as a 1% move on a $4,000 position. Speed you do not need is expensive.",
+                "0": "Ten cents of spread on 400 shares is $40 — roughly a quarter of a percent of the $16,900 position, paid before the market moves at all. Speed you do not need is expensive.",
                 "2": "That price is your invalidation level, not an entry. If it filled, you would own the position at the exact point your plan says the idea is dead.",
                 "3": "Size does not make a wide spread cheaper; it multiplies what you pay for it.",
               },

@@ -97,7 +97,7 @@ export const lesson03PriceFormation: CourseLesson = {
       kind: "example",
       id: "tf-l3-b3",
       example: {
-        title: "Three cents in one second, with no news",
+        title: "Nine cents in one second, with no news",
         setup:
           "NOVA's last price is 20.15 and only 100 shares are offered at 20.16. A fund needs 600 shares immediately and sends a market order. Nothing has been announced and nothing about the company has changed.",
         steps: [

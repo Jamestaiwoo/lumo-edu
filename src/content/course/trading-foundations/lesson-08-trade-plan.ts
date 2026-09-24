@@ -120,7 +120,7 @@ export const lesson08TradePlan: CourseLesson = {
       interaction: {
         type: "trade-plan-builder",
         prompt:
-          "Fill in a plan for a long idea in NOVA. The builder checks that your levels are in a logical order and that the loss stays inside your risk ceiling. Then confirm each statement honestly before you call it finished.",
+          "Fill in a plan for a long idea in NOVA. The builder checks that your levels are in a logical order and that the risk percent stays in a sane band. Then confirm each statement honestly before you call it finished.",
         symbols: ["NOVA", "HELI", "ORCA"],
         fields: [
           { label: "Entry", placeholder: "20.10", unit: "USD" },

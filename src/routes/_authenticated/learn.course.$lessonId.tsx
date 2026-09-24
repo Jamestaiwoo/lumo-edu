@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { ArrowLeft, Check, Clock, Lock, Target, Trophy, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -8,7 +8,8 @@ import { useCompleteLesson, useProgress, type LessonProgress } from "@/lib/api";
 import { ErrorBanner, LoadingState } from "@/components/state/StateViews";
 import { getCourseLesson, getModuleOfLesson, lessonQuestions } from "@/content/course";
 import { isLessonUnlocked, nextLessonIdInTrack } from "@/lib/recommendation";
-import { buildSubmission } from "@/lib/lesson-feedback";
+import { buildSubmission, assessmentLocked } from "@/lib/lesson-feedback";
+import { loadReflections, saveReflections, type MinimalStorage } from "@/lib/reflection-store";
 import type { CompleteLessonResult } from "@/lib/progress.functions";
 import {
   ExplainBlockView,
@@ -30,6 +31,16 @@ const EYEBROW: Record<string, string> = {
   scenario: "Scenario",
 };
 
+/** localStorage when available (browser only); null lets the store fall back to session memory. */
+function browserStorage(): MinimalStorage | null {
+  try {
+    if (typeof window === "undefined") return null;
+    return window.localStorage;
+  } catch {
+    return null;
+  }
+}
+
 function CourseLessonPage() {
   const params = Route.useParams();
   const lesson = getCourseLesson(params.lessonId);
@@ -50,6 +61,18 @@ function CourseLessonPage() {
     if (done || complete.isPending) return;
     setAnswers((prev) => ({ ...prev, [questionId]: raw }));
   };
+  const onReflect = (blockId: string, value: string) => {
+    setReflections((prev) => {
+      const next = { ...prev, [blockId]: value };
+      if (lesson) saveReflections(lesson.id, next, browserStorage());
+      return next;
+    });
+  };
+  useEffect(() => {
+    if (!lesson) return;
+    const stored = loadReflections(lesson.id, browserStorage());
+    if (Object.keys(stored).length > 0) setReflections(stored);
+  }, [lesson]);
   const submit = () => {
     complete.mutate(
       { lessonId: lesson!.id, answers: buildSubmission(questions, answers) },
@@ -206,7 +229,7 @@ function CourseLessonPage() {
                 prompts={block.prompts}
                 helper={block.helper}
                 value={reflections[block.id] ?? ""}
-                onChange={(v) => setReflections((p) => ({ ...p, [block.id]: v }))}
+                onChange={(v) => onReflect(block.id, v)}
               />
             );
           }
@@ -228,7 +251,7 @@ function CourseLessonPage() {
                 intro={block.assessment.intro}
                 assessment={block.assessment}
                 answers={answers}
-                locked={false}
+                locked={assessmentLocked({ done: done !== null, pending: complete.isPending })}
                 allowRetryGlobal={false}
                 onAnswer={onAnswer}
               />
@@ -243,7 +266,7 @@ function CourseLessonPage() {
                 intro={block.scenario.situation.join(" ")}
                 assessment={block.scenario.assessment}
                 answers={answers}
-                locked={false}
+                locked={assessmentLocked({ done: done !== null, pending: complete.isPending })}
                 allowRetryGlobal={false}
                 onAnswer={onAnswer}
               />

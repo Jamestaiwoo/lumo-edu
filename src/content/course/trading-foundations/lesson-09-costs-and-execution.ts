@@ -82,7 +82,7 @@ export const lesson09CostsAndExecution: CourseLesson = {
         label: "Estimated cost of one round trip on a $1,000 position",
         columns: ["Market", "Spread cost", "Commission", "Slippage", "Total", "% of position"],
         rows: [
-          ["Deep large-cap ETF", "$0.05", "$0.00", "$0.00", "$0.05", "0.01%"],
+          ["Deep large-cap ETF", "$0.05", "$0.00", "$0.00", "$0.05", "<0.01%"],
           ["Large-cap share", "$0.22", "$1.00", "$0.05", "$1.27", "0.13%"],
           ["Mid-cap share", "$4.74", "$1.00", "$0.60", "$6.34", "0.63%"],
           ["Small-cap share", "$196", "$1.00", "$18", "$215", "21.5%"],
