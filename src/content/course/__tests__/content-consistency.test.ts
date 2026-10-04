@@ -1,13 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { COURSE_LESSONS, getCourseLesson, lessonAssessmentItems } from "..";
-import type { Candle, OrderBookSnapshot } from "../types";
+import { COURSES, COURSE_LESSONS, getCourseLesson, lessonAssessmentItems } from "..";
+import type { Course, CourseLesson, Candle, OrderBookSnapshot } from "../types";
 
-const lessons = COURSE_LESSONS;
 const lesson = (id: string) => getCourseLesson(id)!;
 
-function candleGroupsOf(lessonId: string): Candle[][] {
+function candleGroupsOf(lesson: CourseLesson): Candle[][] {
   const out: Candle[][] = [];
-  for (const block of lesson(lessonId).blocks) {
+  for (const block of lesson.blocks) {
     if (block.kind === "visual" && block.visual.type === "candles") out.push(block.visual.candles);
     if (block.kind === "interactive" && block.interaction.type === "chart-read")
       out.push(block.interaction.candles);
@@ -15,9 +14,9 @@ function candleGroupsOf(lessonId: string): Candle[][] {
   return out;
 }
 
-function booksOf(lessonId: string): OrderBookSnapshot[] {
+function booksOf(lesson: CourseLesson): OrderBookSnapshot[] {
   const out: OrderBookSnapshot[] = [];
-  for (const block of lesson(lessonId).blocks) {
+  for (const block of lesson.blocks) {
     if (block.kind === "visual" && block.visual.type === "order-book") out.push(block.visual.book);
     if (
       block.kind === "interactive" &&
@@ -29,85 +28,101 @@ function booksOf(lessonId: string): OrderBookSnapshot[] {
   return out;
 }
 
-describe("cross-block numeric consistency", () => {
-  it("keeps every candle internally valid and continuous with its neighbours", () => {
-    for (const current of lessons) {
-      for (const candles of candleGroupsOf(current.id)) {
-        candles.forEach((candle, index) => {
-          const label = `${current.id} candle ${index + 1}`;
-          expect(candle.high, label).toBeGreaterThanOrEqual(Math.max(candle.open, candle.close));
-          expect(candle.low, label).toBeLessThanOrEqual(Math.min(candle.open, candle.close));
-          expect(candle.low, label).toBeGreaterThan(0);
-          if (index > 0) {
-            expect(candle.open, `${label} opens at the previous close`).toBeCloseTo(
-              candles[index - 1]!.close,
-              2,
+/** Invariants that must hold for every lesson of every registered course. */
+function runConsistencyInvariants(course: Course, courseLessons: CourseLesson[]): void {
+  describe(`${course.id} — cross-block numeric consistency`, () => {
+    it("keeps every candle internally valid and continuous with its neighbours", () => {
+      for (const current of courseLessons) {
+        for (const candles of candleGroupsOf(current)) {
+          candles.forEach((candle, index) => {
+            const label = `${current.id} candle ${index + 1}`;
+            expect(candle.high, label).toBeGreaterThanOrEqual(Math.max(candle.open, candle.close));
+            expect(candle.low, label).toBeLessThanOrEqual(Math.min(candle.open, candle.close));
+            expect(candle.low, label).toBeGreaterThan(0);
+            if (index > 0) {
+              expect(candle.open, `${label} opens at the previous close`).toBeCloseTo(
+                candles[index - 1]!.close,
+                2,
+              );
+            }
+          });
+        }
+      }
+    });
+
+    it("keeps every order book sorted with a positive spread", () => {
+      for (const current of courseLessons) {
+        for (const book of booksOf(current)) {
+          for (let i = 1; i < book.asks.length; i++) {
+            expect(book.asks[i]!.price, `${current.id} asks ascending`).toBeGreaterThan(
+              book.asks[i - 1]!.price,
             );
           }
-        });
-      }
-    }
-  });
-
-  it("keeps every order book sorted with a positive spread", () => {
-    for (const current of lessons) {
-      for (const book of booksOf(current.id)) {
-        for (let i = 1; i < book.asks.length; i++) {
-          expect(book.asks[i]!.price, `${current.id} asks ascending`).toBeGreaterThan(
-            book.asks[i - 1]!.price,
-          );
-        }
-        for (let i = 1; i < book.bids.length; i++) {
-          expect(book.bids[i]!.price, `${current.id} bids descending`).toBeLessThan(
-            book.bids[i - 1]!.price,
-          );
-        }
-        expect(book.asks[0]!.price, `${current.id} best bid below best ask`).toBeGreaterThan(
-          book.bids[0]!.price,
-        );
-      }
-    }
-  });
-
-  it("keeps every two-sided quote a real spread", () => {
-    for (const current of lessons) {
-      for (const block of current.blocks) {
-        if (block.kind === "visual" && block.visual.type === "spread") {
-          expect(block.visual.ask, `${current.id} spread visual`).toBeGreaterThan(block.visual.bid);
-        }
-        if (block.kind === "interactive" && block.interaction.type === "spread-explorer") {
-          for (const level of block.interaction.levels) {
-            expect(level.ask, `${current.id} level ${level.name}`).toBeGreaterThan(level.bid);
-          }
-        }
-        if (block.kind === "interactive" && block.interaction.type === "order-type-simulator") {
-          expect(block.interaction.ask, `${current.id} simulator ask`).toBeGreaterThan(
-            block.interaction.bid,
-          );
-        }
-      }
-    }
-  });
-
-  it("keeps every price-path marker inside the data it points at", () => {
-    for (const current of lessons) {
-      for (const block of current.blocks) {
-        if (block.kind === "visual" && block.visual.type === "price-path") {
-          for (const marker of block.visual.markers ?? []) {
-            expect(marker.index, `${current.id} marker "${marker.label}"`).toBeGreaterThanOrEqual(
-              0,
+          for (let i = 1; i < book.bids.length; i++) {
+            expect(book.bids[i]!.price, `${current.id} bids descending`).toBeLessThan(
+              book.bids[i - 1]!.price,
             );
-            expect(marker.index, `${current.id} marker "${marker.label}"`).toBeLessThan(
-              block.visual.points.length,
+          }
+          expect(book.asks[0]!.price, `${current.id} best bid below best ask`).toBeGreaterThan(
+            book.bids[0]!.price,
+          );
+        }
+      }
+    });
+
+    it("keeps every two-sided quote a real spread", () => {
+      for (const current of courseLessons) {
+        for (const block of current.blocks) {
+          if (block.kind === "visual" && block.visual.type === "spread") {
+            expect(block.visual.ask, `${current.id} spread visual`).toBeGreaterThan(
+              block.visual.bid,
+            );
+          }
+          if (block.kind === "interactive" && block.interaction.type === "spread-explorer") {
+            for (const level of block.interaction.levels) {
+              expect(level.ask, `${current.id} level ${level.name}`).toBeGreaterThan(level.bid);
+            }
+          }
+          if (block.kind === "interactive" && block.interaction.type === "order-type-simulator") {
+            expect(block.interaction.ask, `${current.id} simulator ask`).toBeGreaterThan(
+              block.interaction.bid,
             );
           }
         }
       }
-    }
-  });
+    });
 
+    it("keeps every price-path marker inside the data it points at", () => {
+      for (const current of courseLessons) {
+        for (const block of current.blocks) {
+          if (block.kind === "visual" && block.visual.type === "price-path") {
+            for (const marker of block.visual.markers ?? []) {
+              expect(marker.index, `${current.id} marker "${marker.label}"`).toBeGreaterThanOrEqual(
+                0,
+              );
+              expect(marker.index, `${current.id} marker "${marker.label}"`).toBeLessThan(
+                block.visual.points.length,
+              );
+            }
+          }
+        }
+      }
+    });
+  });
+}
+
+for (const course of COURSES) {
+  runConsistencyInvariants(
+    course,
+    COURSE_LESSONS.filter((entry) =>
+      course.modules.some((module) => module.lessonIds.includes(entry.id)),
+    ),
+  );
+}
+
+describe("Course 1 worked examples", () => {
   it("matches tf-l2's worked average to the book it walks", () => {
-    const book = booksOf("tf-l2")[0]!;
+    const book = booksOf(lesson("tf-l2"))[0]!;
     // The example buys 100 shares at each of the three ask levels.
     const fills = [book.asks[0]!, book.asks[1]!, book.asks[2]!];
     const total = fills.reduce((sum, level) => sum + level.price * 100, 0);

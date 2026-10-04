@@ -928,6 +928,30 @@ export const ACHIEVEMENTS: { code: string; title: string; description: string; i
     description: "Finish every lesson in Trading Foundations",
     icon: "graduation-cap",
   },
+  {
+    code: "course_2_risk",
+    title: "Risk Mastered",
+    description: "Finish every lesson in Risk & Position Management",
+    icon: "graduation-cap",
+  },
+  {
+    code: "course_3_charts",
+    title: "Chart Reader",
+    description: "Finish every lesson in Charting & Technical Analysis",
+    icon: "graduation-cap",
+  },
+  {
+    code: "course_4_instruments",
+    title: "Instrument Aware",
+    description: "Finish every lesson in Markets & Instruments",
+    icon: "graduation-cap",
+  },
+  {
+    code: "course_5_microstructure",
+    title: "Book Reader",
+    description: "Finish every lesson in Market Structure & Microstructure",
+    icon: "graduation-cap",
+  },
 ];
 
 export const DISCLAIMER =

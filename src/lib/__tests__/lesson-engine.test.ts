@@ -93,7 +93,12 @@ describe("lesson tracks", () => {
   it("walks the next lesson inside a track only", () => {
     expect(nextLessonIdInTrack("tf-l1")).toBe("tf-l2");
     expect(nextLessonIdInTrack("tf-l9")).toBe("tf-l10");
-    expect(nextLessonIdInTrack("tf-l10")).toBeUndefined();
+    // Course boundaries: each course flows into the next; terminal is the spine's last lesson.
+    expect(nextLessonIdInTrack("tf-l10")).toBe("rp-l1");
+    expect(nextLessonIdInTrack("rp-l9")).toBe("tc-l1");
+    expect(nextLessonIdInTrack("tc-l9")).toBe("mk-l1");
+    expect(nextLessonIdInTrack("mk-l12")).toBe("ms-l1");
+    expect(nextLessonIdInTrack("ms-l8")).toBeUndefined();
     expect(nextLessonIdInTrack("w1l1")).toBe("w1l2");
     expect(nextLessonIdInTrack("unknown")).toBeUndefined();
   });
