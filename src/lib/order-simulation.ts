@@ -65,6 +65,19 @@ export function simulateOrder(request: SimOrderRequest): SimOrderOutcome {
     };
   }
 
+  if (!Number.isFinite(limit) || limit <= 0) {
+    const shown = Number.isFinite(limit) ? price(limit) : "an unreadable value";
+    return {
+      status: "unfilled",
+      immediate: false,
+      filledAtTick: null,
+      fillPrice: null,
+      headline: `A limit of ${shown} cannot trade`,
+      detail:
+        "An order needs a positive price the market could actually quote. At or below zero — or missing — nothing can ever fill, no matter how the market moves.",
+    };
+  }
+
   if (side === "buy") {
     if (limit >= ask) {
       return {

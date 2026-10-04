@@ -41,7 +41,6 @@ dist-ssr
 .gemini/
 .hermes/
 .iflow/
-openspec/
 .github/agents/
 .github/prompts/
 .github/skills/

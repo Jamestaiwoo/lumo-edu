@@ -17,6 +17,10 @@ import type {
   LearningBlockWithAssessment,
 } from "./types";
 import { tradingFoundationsCourse } from "./trading-foundations";
+import { riskPositionCourse } from "./risk-and-position";
+import { chartingCourse } from "./charting";
+import { marketsInstrumentsCourse } from "./markets-instruments";
+import { marketStructureCourse } from "./market-structure";
 
 export type {
   Assessment,
@@ -48,7 +52,13 @@ export type {
   WorkedStep,
 } from "./types";
 
-export const COURSES: Course[] = [tradingFoundationsCourse];
+export const COURSES: Course[] = [
+  tradingFoundationsCourse,
+  riskPositionCourse,
+  chartingCourse,
+  marketsInstrumentsCourse,
+  marketStructureCourse,
+];
 
 export const COURSE_LESSONS: CourseLesson[] = COURSES.flatMap((course) => course.lessons);
 

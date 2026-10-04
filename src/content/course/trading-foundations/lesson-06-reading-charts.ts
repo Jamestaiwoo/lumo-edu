@@ -104,7 +104,7 @@ export const lesson06ReadingCharts: CourseLesson = {
           { open: 20.12, high: 20.52, low: 20.08, close: 20.46 },
         ],
         caption:
-          "Two facts stand out and neither needs an indicator: the lows from the fourth candle onward keep rising, and the final candle closed above the zone that previously rejected price. That is evidence about supply — not a promise about tomorrow.",
+          "After selling off into support, the lows rise from the fourth candle through the eighth, and after one pullback the final candle closed above the zone that previously rejected price. That is evidence about supply — not a promise about tomorrow.",
       },
     },
     {
@@ -171,7 +171,8 @@ export const lesson06ReadingCharts: CourseLesson = {
         ],
         tasks: [
           {
-            prompt: "What do the rising lows across the second half of the chart tell you?",
+            prompt:
+              "From the fourth candle to the eighth, each low is higher than the one before. What does that tell you?",
             options: [
               "Buyers have been willing to step in at progressively higher prices",
               "Sellers are firmly in control",

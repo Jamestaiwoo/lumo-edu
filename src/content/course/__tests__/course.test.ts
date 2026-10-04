@@ -23,43 +23,75 @@ describe("course registry", () => {
     expect(course.outcomes.length).toBeGreaterThanOrEqual(3);
   });
 
-  it("keeps module order and lesson order in agreement", () => {
-    const flattened = course.modules.flatMap((module) => module.lessonIds);
-    expect(flattened).toEqual(COURSE_LESSON_ORDER);
-    expect(courseLessons(course.id).map((lesson) => lesson.id)).toEqual(flattened);
+  it("gives every course an id, achievement, outcomes, and at least one module with lessons", () => {
+    const courseIds = new Set<string>();
+    const achievements = new Set<string>();
+    for (const entry of COURSES) {
+      expect(entry.id, `${entry.title} id`).toBeTruthy();
+      expect(courseIds.has(entry.id), `${entry.id} course id unique`).toBe(false);
+      courseIds.add(entry.id);
+      expect(achievements.has(entry.completionAchievement), `${entry.id} achievement unique`).toBe(
+        false,
+      );
+      achievements.add(entry.completionAchievement);
+      expect(entry.outcomes.length, `${entry.id} outcomes`).toBeGreaterThanOrEqual(3);
+      expect(entry.modules.length, `${entry.id} modules`).toBeGreaterThan(0);
+      expect(entry.lessons.length, `${entry.id} lessons`).toBeGreaterThan(0);
+    }
+  });
+
+  it("keeps module order and lesson order in agreement for every course", () => {
+    for (const entry of COURSES) {
+      const flattened = entry.modules.flatMap((module) => module.lessonIds);
+      expect(flattened, `${entry.id} module order`).toEqual(
+        entry.lessons.map((lesson) => lesson.id),
+      );
+      expect(
+        courseLessons(entry.id).map((lesson) => lesson.id),
+        `${entry.id} path order`,
+      ).toEqual(flattened);
+    }
+    expect(COURSE_LESSON_ORDER).toEqual(COURSES.flatMap((entry) => entry.lessons.map((l) => l.id)));
   });
 
   it("resolves every module lesson id and assigns it back to that module", () => {
-    for (const module of course.modules) {
-      expect(module.lessonIds.length).toBeGreaterThan(0);
-      for (const lessonId of module.lessonIds) {
-        const lesson = getCourseLesson(lessonId);
-        expect(lesson, `${lessonId} should resolve`).toBeDefined();
-        expect(lesson!.moduleId).toBe(module.id);
-        expect(getModuleOfLesson(lessonId)?.module.id).toBe(module.id);
-        expect(getModuleOfLesson(lessonId)?.course.id).toBe(course.id);
+    for (const entry of COURSES) {
+      for (const module of entry.modules) {
+        expect(module.lessonIds.length, `${module.id} lessons`).toBeGreaterThan(0);
+        for (const lessonId of module.lessonIds) {
+          const lesson = getCourseLesson(lessonId);
+          expect(lesson, `${lessonId} should resolve`).toBeDefined();
+          expect(lesson!.moduleId).toBe(module.id);
+          expect(getModuleOfLesson(lessonId)?.module.id).toBe(module.id);
+          expect(getModuleOfLesson(lessonId)?.course.id).toBe(entry.id);
+        }
       }
     }
   });
 
-  it("has ten lessons and no duplicate ids", () => {
-    expect(COURSE_LESSONS).toHaveLength(10);
+  it("keeps Trading Foundations at ten lessons and every lesson id unique", () => {
+    expect(course.lessons).toHaveLength(10);
     const ids = new Set(COURSE_LESSONS.map((lesson) => lesson.id));
     expect(ids.size).toBe(COURSE_LESSONS.length);
+    const moduleIds = new Set(COURSES.flatMap((entry) => entry.modules).map((m) => m.id));
+    expect(moduleIds.size).toBe(COURSES.flatMap((entry) => entry.modules).length);
   });
 
   it("reports progress from completed lesson ids", () => {
-    expect(courseProgress(course, [])).toMatchObject({
-      completed: 0,
-      total: 10,
-      percent: 0,
-      done: false,
-    });
-    expect(courseProgress(course, COURSE_LESSON_ORDER.slice(0, 5))).toMatchObject({
-      completed: 5,
-      percent: 50,
-    });
-    expect(courseProgress(course, COURSE_LESSON_ORDER).done).toBe(true);
+    for (const entry of COURSES) {
+      const order = courseLessons(entry.id).map((lesson) => lesson.id);
+      expect(courseProgress(entry, []), `${entry.id} empty`).toMatchObject({
+        completed: 0,
+        total: order.length,
+        percent: 0,
+        done: false,
+      });
+      expect(
+        courseProgress(entry, order.slice(0, Math.floor(order.length / 2))),
+        `${entry.id} halfway`,
+      ).toMatchObject({ completed: Math.floor(order.length / 2) });
+      expect(courseProgress(entry, order).done, `${entry.id} complete`).toBe(true);
+    }
   });
 });
 

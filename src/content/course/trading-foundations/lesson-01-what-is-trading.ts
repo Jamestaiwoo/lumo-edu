@@ -70,7 +70,7 @@ export const lesson01WhatIsTrading: CourseLesson = {
         points: [40.0, 41.2, 39.6, 42.8, 41.5, 43.9, 42.1, 44.6, 43.2, 45.8, 44.9, 46.4],
         markers: [
           { index: 2, label: "pullback", tone: "down" },
-          { index: 7, label: "higher low", tone: "up" },
+          { index: 8, label: "higher low", tone: "up" },
           { index: 11, label: "new high", tone: "up" },
         ],
         caption:

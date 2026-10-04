@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Check } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import type { TradePlanField } from "@/content/course/types";
+import { validateTradePlanInput } from "@/lib/interaction-validation";
 import { BlockCard } from "../blocks/BlockChrome";
 
 const num = (v: string) => Number(v.replace(/[^0-9.-]/g, ""));
@@ -34,9 +35,14 @@ export function TradePlanBuilderView(p: {
     num(vals[2] ?? ""),
     num(vals[3] ?? ""),
   ];
-  const ordered = dir === "long" ? stop < entry && entry < target : target < entry && entry < stop;
-  const riskOk = risk > 0 && risk <= 5;
-  const valid = [entry, stop, target, risk].every(Number.isFinite) && ordered && riskOk;
+  const validation = validateTradePlanInput({
+    direction: dir,
+    entry,
+    stop,
+    target,
+    riskPct: risk,
+  });
+  const valid = validation.ok;
   const complete = valid && done.every(Boolean);
   return (
     <BlockCard eyebrow="Interactive · build" title={p.title}>
@@ -85,10 +91,8 @@ export function TradePlanBuilderView(p: {
       </div>
       {!valid ? (
         <p className="mt-3 rounded-2xl border bg-secondary/30 p-3 text-xs leading-relaxed">
-          {!ordered && Number.isFinite(entry)
-            ? `Order must be ${dir === "long" ? "stop < entry < target" : "target < entry < stop"}. `
-            : ""}
-          {!riskOk && Number.isFinite(risk) ? "Keep risk between 0 and 5%. " : ""}
+          {validation.message}
+          <br />
           {symbol} {dir}: entry {Number.isFinite(entry) ? entry.toFixed(2) : "—"}.
         </p>
       ) : null}

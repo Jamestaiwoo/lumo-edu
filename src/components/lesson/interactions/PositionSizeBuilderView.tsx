@@ -3,6 +3,7 @@ import { Check } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import type { PositionSizeMission } from "@/content/course/types";
+import { validatePositionSizeInput } from "@/lib/interaction-validation";
 import { BlockCard } from "../blocks/BlockChrome";
 
 function sizeFor(balance: number, riskPct: number, entry: number, stop: number): number {
@@ -52,7 +53,18 @@ export function PositionSizeBuilderView({
     Number.isFinite(parsed.shares) &&
     parsed.shares >= mission.minShares &&
     parsed.shares <= mission.maxShares;
-  const showHint = !success && Number.isFinite(parsed.shares);
+  const validation = validatePositionSizeInput({
+    balance: parsed.balance,
+    entry: parsed.entry,
+    stop: parsed.stop,
+    riskPct,
+  });
+  const showHint = success || !validation.ok ? false : Number.isFinite(parsed.shares);
+  const sharesLabel = !validation.ok
+    ? null
+    : Number.isFinite(parsed.shares)
+      ? `${parsed.shares.toLocaleString("en-US")} shares`
+      : null;
 
   return (
     <BlockCard eyebrow="Interactive · calculator" title={title}>
@@ -111,16 +123,14 @@ export function PositionSizeBuilderView({
           {Number.isFinite(parsed.budget) ? `${parsed.budget.toFixed(2)} ${currency}` : "—"} · stop
           distance {Number.isFinite(parsed.distance) ? parsed.distance.toFixed(2) : "—"}
         </p>
-        <p className="mt-1 text-lg font-bold">
-          {Number.isFinite(parsed.shares)
-            ? `${parsed.shares.toLocaleString("en-US")} shares`
-            : "Enter valid numbers"}
-        </p>
+        <p className="mt-1 text-lg font-bold">{sharesLabel ?? "Fix the inputs above"}</p>
         <p className="text-xs text-muted-foreground">
           Loss if stopped:{" "}
           {Number.isFinite(parsed.lossAtStop) ? `${parsed.lossAtStop.toFixed(2)} ${currency}` : "—"}
         </p>
-        {success ? (
+        {!validation.ok ? (
+          <p className="mt-2 text-xs leading-relaxed text-destructive">{validation.message}</p>
+        ) : success ? (
           <p className="mt-2 flex items-start gap-1.5 text-xs leading-relaxed">
             <Check className="mt-0.5 size-3.5 shrink-0 text-success" aria-hidden />
             <span>{mission.success}</span>
