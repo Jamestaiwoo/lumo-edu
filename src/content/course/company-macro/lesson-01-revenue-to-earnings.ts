@@ -102,7 +102,8 @@ export const lesson01RevenueToEarnings: CourseLesson = {
         choices: [
           {
             label: "Check whether margins held, rose or fell",
-            outcome: "You see operating margin fell from 16% to 9%, so operating income actually dropped.",
+            outcome:
+              "You see operating margin fell from 16% to 9%, so operating income actually dropped.",
             best: true,
             feedback:
               "Right — growth is only good news if enough of it reaches the profit lines. Margins answer that.",
@@ -228,10 +229,11 @@ export const lesson01RevenueToEarnings: CourseLesson = {
                 answer: 66,
                 tolerance: 0.5,
                 unit: "$m",
-                explain:
-                  "12% × $550m = $66m — down from $80m (−17.5%) even though sales grew 10%.",
+                explain: "12% × $550m = $66m — down from $80m (−17.5%) even though sales grew 10%.",
               },
-              feedbackByAnswer: { numeric: "Operating income = margin × revenue = 0.12 × 550 = 66." },
+              feedbackByAnswer: {
+                numeric: "Operating income = margin × revenue = 0.12 × 550 = 66.",
+              },
             },
           ],
         },

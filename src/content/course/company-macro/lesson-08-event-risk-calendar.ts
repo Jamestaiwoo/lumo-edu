@@ -29,9 +29,18 @@ export const lesson08EventRiskCalendar: CourseLesson = {
           "Alternatives include reducing size, closing before the event, or simply waiting for the event to pass and the market to settle.",
         ],
         keyTerms: [
-          { term: "Economic calendar", definition: "Schedule of upcoming data releases and policy decisions." },
-          { term: "Event risk", definition: "The chance of a large, sudden move around a scheduled event." },
-          { term: "Gap", definition: "A jump between one price and the next with no trading in between." },
+          {
+            term: "Economic calendar",
+            definition: "Schedule of upcoming data releases and policy decisions.",
+          },
+          {
+            term: "Event risk",
+            definition: "The chance of a large, sudden move around a scheduled event.",
+          },
+          {
+            term: "Gap",
+            definition: "A jump between one price and the next with no trading in between.",
+          },
         ],
         callouts: [
           {
@@ -47,14 +56,19 @@ export const lesson08EventRiskCalendar: CourseLesson = {
       id: "cm-l8-b2",
       example: {
         title: "Normal size versus event size",
-        setup: "Account $20,000, risk rule 1% per trade. Stop distance $2 per share. Before a rate decision, a gap of $5 per share is plausible.",
+        setup:
+          "Account $20,000, risk rule 1% per trade. Stop distance $2 per share. Before a rate decision, a gap of $5 per share is plausible.",
         steps: [
           { label: "Risk budget", detail: "1% × $20,000 = $200." },
           { label: "Normal size", detail: "$200 ÷ $2 = 100 shares." },
           { label: "Gap loss at normal size", detail: "100 × $5 = $500 — 2.5× the budget." },
-          { label: "Event size", detail: "$200 ÷ $5 = 40 shares, so a $5 gap still costs only $200." },
+          {
+            label: "Event size",
+            detail: "$200 ÷ $5 = 40 shares, so a $5 gap still costs only $200.",
+          },
         ],
-        takeaway: "Same rule, different input: around events the gap, not the stop, defines the risk.",
+        takeaway:
+          "Same rule, different input: around events the gap, not the stop, defines the risk.",
       },
     },
     {
@@ -79,12 +93,17 @@ export const lesson08EventRiskCalendar: CourseLesson = {
       title: "Week ahead",
       interaction: {
         type: "scenario-decision",
-        prompt: "You plan a new swing trade on Monday. The calendar shows a rate decision on Wednesday. What do you do?",
-        situation: ["Your normal hold is three to five days.", "The decision could move your instrument several stops' worth."],
+        prompt:
+          "You plan a new swing trade on Monday. The calendar shows a rate decision on Wednesday. What do you do?",
+        situation: [
+          "Your normal hold is three to five days.",
+          "The decision could move your instrument several stops' worth.",
+        ],
         choices: [
           {
             label: "Size for a plausible gap, or wait until after the decision",
-            outcome: "The decision causes a big swing; your loss, had it gone against you, stays within plan.",
+            outcome:
+              "The decision causes a big swing; your loss, had it gone against you, stays within plan.",
             best: true,
             feedback: "Right — you accounted for a known risk on a known date.",
           },
@@ -131,7 +150,8 @@ export const lesson08EventRiskCalendar: CourseLesson = {
               id: "cm-l8-q2",
               type: "numeric",
               topic: "events",
-              prompt: "Same $200 budget, but a $5 gap per share is plausible. How many shares keep the gap loss within budget?",
+              prompt:
+                "Same $200 budget, but a $5 gap per share is plausible. How many shares keep the gap loss within budget?",
               answer: 40,
               tolerance: 0.5,
               unit: "shares",
@@ -154,8 +174,14 @@ export const lesson08EventRiskCalendar: CourseLesson = {
               id: "cm-l8-q3",
               type: "mcq",
               topic: "stops",
-              prompt: "Price gaps from $50 to $44 overnight. Your stop was at $48. Where does it most likely fill?",
-              options: ["Near $44, the first available price", "Exactly $48", "At $50", "It is cancelled automatically"],
+              prompt:
+                "Price gaps from $50 to $44 overnight. Your stop was at $48. Where does it most likely fill?",
+              options: [
+                "Near $44, the first available price",
+                "Exactly $48",
+                "At $50",
+                "It is cancelled automatically",
+              ],
               answer: 0,
               explain:
                 "A triggered stop becomes a market order and fills at the next available price — here near $44.",
@@ -174,7 +200,8 @@ export const lesson08EventRiskCalendar: CourseLesson = {
               topic: "stops",
               prompt: "A standard stop-loss order guarantees your exit price.",
               answer: false,
-              explain: "Standard stops guarantee an attempt to exit, not the price. Gaps and fast markets cause slippage.",
+              explain:
+                "Standard stops guarantee an attempt to exit, not the price. Gaps and fast markets cause slippage.",
             },
             feedbackByAnswer: {
               true: "Only the trigger level is fixed; the fill price is not.",
@@ -229,7 +256,8 @@ export const lesson08EventRiskCalendar: CourseLesson = {
         "Around events, size for the plausible gap: shares = risk ÷ gap.",
         "Reducing size, exiting or waiting are all valid plans.",
       ],
-      nextStep: "You've finished Company & Macro Analysis. Next up: Crypto Foundations, when it becomes available.",
+      nextStep:
+        "You've finished Company & Macro Analysis. Next up: Crypto Foundations, when it becomes available.",
     },
   ],
 };

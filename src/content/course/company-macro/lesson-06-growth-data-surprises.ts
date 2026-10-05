@@ -47,13 +47,18 @@ export const lesson06GrowthDataSurprises: CourseLesson = {
       id: "cm-l6-b2",
       example: {
         title: "A jobs report, line by line",
-        setup: "Consensus expects 180,000 new jobs. The report shows 120,000, and last month is revised from 200,000 to 150,000.",
+        setup:
+          "Consensus expects 180,000 new jobs. The report shows 120,000, and last month is revised from 200,000 to 150,000.",
         steps: [
           { label: "Headline surprise", detail: "120k − 180k = −60k." },
           { label: "Revision", detail: "150k − 200k = −50k." },
-          { label: "Combined", detail: "−60k + (−50k) = −110k fewer jobs than the market believed." },
+          {
+            label: "Combined",
+            detail: "−60k + (−50k) = −110k fewer jobs than the market believed.",
+          },
         ],
-        takeaway: "The report is weaker than the headline alone suggests once revisions are counted.",
+        takeaway:
+          "The report is weaker than the headline alone suggests once revisions are counted.",
       },
     },
     {
@@ -78,8 +83,12 @@ export const lesson06GrowthDataSurprises: CourseLesson = {
       title: "Strong data, falling stocks",
       interaction: {
         type: "scenario-decision",
-        prompt: "GDP growth beats consensus by a wide margin while inflation is above target. Stocks drop. Why?",
-        situation: ["Bond yields rise sharply after the release.", "The central bank has been signalling concern about inflation."],
+        prompt:
+          "GDP growth beats consensus by a wide margin while inflation is above target. Stocks drop. Why?",
+        situation: [
+          "Bond yields rise sharply after the release.",
+          "The central bank has been signalling concern about inflation.",
+        ],
         choices: [
           {
             label: "Strong growth raised expectations of higher rates",
@@ -116,7 +125,8 @@ export const lesson06GrowthDataSurprises: CourseLesson = {
               id: "cm-l6-q1",
               type: "numeric",
               topic: "macro",
-              prompt: "Consensus is 180k jobs and the actual is 120k. What is the surprise in thousands?",
+              prompt:
+                "Consensus is 180k jobs and the actual is 120k. What is the surprise in thousands?",
               answer: -60,
               tolerance: 0.5,
               unit: "k",
@@ -130,7 +140,8 @@ export const lesson06GrowthDataSurprises: CourseLesson = {
               id: "cm-l6-q2",
               type: "numeric",
               topic: "macro",
-              prompt: "Add a revision from 200k to 150k. What is the combined difference in thousands?",
+              prompt:
+                "Add a revision from 200k to 150k. What is the combined difference in thousands?",
               answer: -110,
               tolerance: 0.5,
               unit: "k",
@@ -161,7 +172,8 @@ export const lesson06GrowthDataSurprises: CourseLesson = {
                 "Trading stops until the next release",
               ],
               answer: 0,
-              explain: "Prices already reflect the consensus, so an in-line number contains little new information.",
+              explain:
+                "Prices already reflect the consensus, so an in-line number contains little new information.",
             },
             feedbackByAnswer: {
               "1": "'Good' is measured against expectations; an in-line number adds little news.",
@@ -219,7 +231,9 @@ export const lesson06GrowthDataSurprises: CourseLesson = {
       id: "cm-l6-b8",
       title: "Reflection",
       helper: "One or two sentences. Stays in your browser.",
-      prompts: ["Before the next big release, what would you write down so you can judge the surprise afterwards?"],
+      prompts: [
+        "Before the next big release, what would you write down so you can judge the surprise afterwards?",
+      ],
     },
     {
       kind: "summary",

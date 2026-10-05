@@ -881,6 +881,10 @@ export const TOPIC_LABELS: Record<string, string> = {
   execution: "Execution",
   fees: "Fees & costs",
   "trade-planning": "Trade planning",
+  fundamentals: "Company fundamentals",
+  valuation: "Valuation",
+  macro: "Macro drivers",
+  events: "Event risk",
 };
 
 export const ACHIEVEMENTS: { code: string; title: string; description: string; icon: string }[] = [
@@ -950,6 +954,12 @@ export const ACHIEVEMENTS: { code: string; title: string; description: string; i
     code: "course_5_microstructure",
     title: "Book Reader",
     description: "Finish every lesson in Market Structure & Microstructure",
+    icon: "graduation-cap",
+  },
+  {
+    code: "course_6_macro",
+    title: "Macro Minded",
+    description: "Finish every lesson in Company & Macro Analysis",
     icon: "graduation-cap",
   },
 ];

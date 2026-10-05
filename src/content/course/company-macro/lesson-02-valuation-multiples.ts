@@ -31,7 +31,10 @@ export const lesson02ValuationMultiples: CourseLesson = {
         keyTerms: [
           { term: "P/E ratio", definition: "Share price ÷ earnings per share." },
           { term: "Earnings yield", definition: "EPS ÷ share price — the inverse of P/E." },
-          { term: "Re-rating", definition: "A change in the multiple investors are willing to pay." },
+          {
+            term: "Re-rating",
+            definition: "A change in the multiple investors are willing to pay.",
+          },
         ],
         callouts: [
           {
@@ -57,7 +60,8 @@ export const lesson02ValuationMultiples: CourseLesson = {
           },
           {
             label: "Re-rating",
-            detail: "If EPS rises to $1.155 but P/E falls to 16, price = 16 × 1.155 = $18.48 — a loss despite growth.",
+            detail:
+              "If EPS rises to $1.155 but P/E falls to 16, price = 16 × 1.155 = $18.48 — a loss despite growth.",
           },
         ],
         takeaway: "Price = multiple × earnings. Either factor can move the stock.",
@@ -78,7 +82,8 @@ export const lesson02ValuationMultiples: CourseLesson = {
           ["Earnings yield", "5%", "10%"],
           ["Expected EPS trend", "Growing", "Shrinking"],
         ],
-        caption: "Educational figures. B looks cheaper on P/E, but the market is pricing in falling earnings.",
+        caption:
+          "Educational figures. B looks cheaper on P/E, but the market is pricing in falling earnings.",
       },
     },
     {
@@ -87,7 +92,8 @@ export const lesson02ValuationMultiples: CourseLesson = {
       title: "Is P/E 10 a bargain?",
       interaction: {
         type: "scenario-decision",
-        prompt: "Stock B trades at P/E 10 while peers sit at 20. What is the most useful next step?",
+        prompt:
+          "Stock B trades at P/E 10 while peers sit at 20. What is the most useful next step?",
         situation: [
           "B's last two earnings reports showed falling sales.",
           "Analysts have cut next year's EPS estimates by 30%.",
@@ -95,7 +101,8 @@ export const lesson02ValuationMultiples: CourseLesson = {
         choices: [
           {
             label: "Find out why the multiple is low before judging it",
-            outcome: "You learn estimates are falling; on next year's EPS the P/E is about 14, not 10.",
+            outcome:
+              "You learn estimates are falling; on next year's EPS the P/E is about 14, not 10.",
             best: true,
             feedback:
               "Good process — a low multiple is information about expectations, not a buy signal on its own.",
@@ -104,7 +111,8 @@ export const lesson02ValuationMultiples: CourseLesson = {
             label: "Conclude it is half price versus peers",
             outcome: "Earnings keep shrinking and the 'cheap' stock gets cheaper.",
             best: false,
-            feedback: "Multiples compare price to earnings that may not last. That is the value trap.",
+            feedback:
+              "Multiples compare price to earnings that may not last. That is the value trap.",
           },
           {
             label: "Ignore valuation entirely",
@@ -114,7 +122,8 @@ export const lesson02ValuationMultiples: CourseLesson = {
           },
         ],
       },
-      takeaway: "A multiple tells you what is expected. The question is whether reality will differ.",
+      takeaway:
+        "A multiple tells you what is expected. The question is whether reality will differ.",
     },
     {
       kind: "practice",
@@ -165,7 +174,8 @@ export const lesson02ValuationMultiples: CourseLesson = {
               id: "cm-l2-q3",
               type: "mcq",
               topic: "valuation",
-              prompt: "A company trades at P/E 45 while its sector averages 15. What does that most likely reflect?",
+              prompt:
+                "A company trades at P/E 45 while its sector averages 15. What does that most likely reflect?",
               options: [
                 "The market expects much faster earnings growth",
                 "The stock is guaranteed to fall",
@@ -225,7 +235,9 @@ export const lesson02ValuationMultiples: CourseLesson = {
                 explain:
                   "Price = P/E × EPS = 20 × 2.50 = $50, a 25% rise matching the 25% EPS growth. In reality the multiple can change too.",
               },
-              feedbackByAnswer: { numeric: "Multiply the unchanged P/E by new EPS: 20 × 2.50 = 50." },
+              feedbackByAnswer: {
+                numeric: "Multiply the unchanged P/E by new EPS: 20 × 2.50 = 50.",
+              },
             },
           ],
         },

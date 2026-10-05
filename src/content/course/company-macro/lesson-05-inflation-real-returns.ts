@@ -52,7 +52,10 @@ export const lesson05InflationRealReturns: CourseLesson = {
           { label: "Nominal", detail: "$10,000 × 1.05 = $10,500." },
           { label: "Approximate real return", detail: "5% − 3% = 2%." },
           { label: "Exact real return", detail: "1.05 ÷ 1.03 − 1 ≈ 1.94%." },
-          { label: "If inflation were 7%", detail: "5% − 7% = −2%: more dollars, less purchasing power." },
+          {
+            label: "If inflation were 7%",
+            detail: "5% − 7% = −2%: more dollars, less purchasing power.",
+          },
         ],
         takeaway: "Always ask what a return buys, not just what it reads on screen.",
       },
@@ -80,7 +83,8 @@ export const lesson05InflationRealReturns: CourseLesson = {
       title: "Hot inflation print",
       interaction: {
         type: "scenario-decision",
-        prompt: "CPI comes in at 4.1% versus 3.6% expected. What is the most reasonable context to consider?",
+        prompt:
+          "CPI comes in at 4.1% versus 3.6% expected. What is the most reasonable context to consider?",
         situation: [
           "The central bank has said it will act if inflation stays elevated.",
           "Bond yields jump within seconds of the release.",
@@ -90,13 +94,15 @@ export const lesson05InflationRealReturns: CourseLesson = {
             label: "Higher rate expectations may pressure valuations; reassess exposure",
             outcome: "You review rate-sensitive positions instead of reacting to the first tick.",
             best: true,
-            feedback: "Good — the surprise changed rate expectations, which matters for many assets. Outcomes stay uncertain.",
+            feedback:
+              "Good — the surprise changed rate expectations, which matters for many assets. Outcomes stay uncertain.",
           },
           {
             label: "Inflation is good for stocks, so buy everything",
             outcome: "Yields rise and valuations compress.",
             best: false,
-            feedback: "Unexpected inflation usually raises rate expectations, which tends to weigh on valuations.",
+            feedback:
+              "Unexpected inflation usually raises rate expectations, which tends to weigh on valuations.",
           },
           {
             label: "Ignore it — only the level matters, not expectations",
@@ -121,7 +127,8 @@ export const lesson05InflationRealReturns: CourseLesson = {
               id: "cm-l5-q1",
               type: "numeric",
               topic: "macro",
-              prompt: "Savings earn 5% while inflation is 3%. What is the approximate real return in percent?",
+              prompt:
+                "Savings earn 5% while inflation is 3%. What is the approximate real return in percent?",
               answer: 2,
               tolerance: 0.1,
               unit: "%",
@@ -159,7 +166,8 @@ export const lesson05InflationRealReturns: CourseLesson = {
               id: "cm-l5-q3",
               type: "mcq",
               topic: "macro",
-              prompt: "Inflation comes in well above expectations. What is a common first-order market effect?",
+              prompt:
+                "Inflation comes in well above expectations. What is a common first-order market effect?",
               options: [
                 "Expectations of higher interest rates and higher bond yields",
                 "Bond yields always fall",
@@ -199,7 +207,10 @@ export const lesson05InflationRealReturns: CourseLesson = {
       id: "cm-l5-b7",
       title: "Application scenario",
       scenario: {
-        situation: ["Your portfolio returned 8% this year.", "Inflation over the same year was 5%."],
+        situation: [
+          "Your portfolio returned 8% this year.",
+          "Inflation over the same year was 5%.",
+        ],
         assessment: {
           items: [
             {
@@ -225,7 +236,9 @@ export const lesson05InflationRealReturns: CourseLesson = {
       id: "cm-l5-b8",
       title: "Reflection",
       helper: "One or two sentences. Stays in your browser.",
-      prompts: ["How would you judge a year's trading result differently now that you think in real terms?"],
+      prompts: [
+        "How would you judge a year's trading result differently now that you think in real terms?",
+      ],
     },
     {
       kind: "summary",

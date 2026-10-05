@@ -98,7 +98,8 @@ describe("lesson tracks", () => {
     expect(nextLessonIdInTrack("rp-l9")).toBe("tc-l1");
     expect(nextLessonIdInTrack("tc-l9")).toBe("mk-l1");
     expect(nextLessonIdInTrack("mk-l12")).toBe("ms-l1");
-    expect(nextLessonIdInTrack("ms-l8")).toBeUndefined();
+    expect(nextLessonIdInTrack("ms-l8")).toBe("cm-l1");
+    expect(nextLessonIdInTrack("cm-l8")).toBeUndefined();
     expect(nextLessonIdInTrack("w1l1")).toBe("w1l2");
     expect(nextLessonIdInTrack("unknown")).toBeUndefined();
   });

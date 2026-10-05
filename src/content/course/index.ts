@@ -21,6 +21,7 @@ import { riskPositionCourse } from "./risk-and-position";
 import { chartingCourse } from "./charting";
 import { marketsInstrumentsCourse } from "./markets-instruments";
 import { marketStructureCourse } from "./market-structure";
+import { companyMacroCourse } from "./company-macro";
 
 export type {
   Assessment,
@@ -58,6 +59,7 @@ export const COURSES: Course[] = [
   chartingCourse,
   marketsInstrumentsCourse,
   marketStructureCourse,
+  companyMacroCourse,
 ];
 
 export const COURSE_LESSONS: CourseLesson[] = COURSES.flatMap((course) => course.lessons);
