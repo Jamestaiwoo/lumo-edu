@@ -31,7 +31,10 @@ export const lesson07EarningsSeason: CourseLesson = {
         keyTerms: [
           { term: "Earnings surprise", definition: "(Actual EPS − consensus) ÷ consensus." },
           { term: "Guidance", definition: "Management's forecast for future results." },
-          { term: "Implied move", definition: "The price swing options markets are pricing in around an event." },
+          {
+            term: "Implied move",
+            definition: "The price swing options markets are pricing in around an event.",
+          },
         ],
         callouts: [
           {
@@ -47,12 +50,19 @@ export const lesson07EarningsSeason: CourseLesson = {
       id: "cm-l7-b2",
       example: {
         title: "A beat with a cut to guidance",
-        setup: "Consensus EPS $1.00; actual $1.10. Stock at $50 with an implied move of ±6%. Guidance for next year is lowered.",
+        setup:
+          "Consensus EPS $1.00; actual $1.10. Stock at $50 with an implied move of ±6%. Guidance for next year is lowered.",
         steps: [
           { label: "Surprise", detail: "(1.10 − 1.00) ÷ 1.00 = 10% beat." },
-          { label: "Expected range", detail: "6% × $50 = $3, so the market priced roughly $47 to $53." },
+          {
+            label: "Expected range",
+            detail: "6% × $50 = $3, so the market priced roughly $47 to $53.",
+          },
           { label: "Guidance", detail: "Lower outlook reduces expected future earnings." },
-          { label: "Reaction", detail: "The stock opens at $46.50 — below the implied range despite the beat." },
+          {
+            label: "Reaction",
+            detail: "The stock opens at $46.50 — below the implied range despite the beat.",
+          },
         ],
         takeaway: "The past quarter beat; the future looked worse. Prices follow the future.",
       },
@@ -80,14 +90,20 @@ export const lesson07EarningsSeason: CourseLesson = {
       title: "Holding through earnings",
       interaction: {
         type: "scenario-decision",
-        prompt: "You hold a position with a stop 4% below price. Earnings are tonight with a 9% implied move. What is the disciplined response?",
-        situation: ["Results arrive after the close.", "Your stop cannot execute while the market is closed."],
+        prompt:
+          "You hold a position with a stop 4% below price. Earnings are tonight with a 9% implied move. What is the disciplined response?",
+        situation: [
+          "Results arrive after the close.",
+          "Your stop cannot execute while the market is closed.",
+        ],
         choices: [
           {
-            label: "Decide in advance: reduce size or exit so a gap past the stop stays within your risk limit",
+            label:
+              "Decide in advance: reduce size or exit so a gap past the stop stays within your risk limit",
             outcome: "The stock gaps 10%; your loss is within plan because size was reduced.",
             best: true,
-            feedback: "Right — you planned for the gap instead of relying on a stop that cannot fill.",
+            feedback:
+              "Right — you planned for the gap instead of relying on a stop that cannot fill.",
           },
           {
             label: "Keep full size; the stop limits the loss to 4%",
@@ -99,11 +115,13 @@ export const lesson07EarningsSeason: CourseLesson = {
             label: "Double the position because results will probably beat",
             outcome: "Even a beat can fall; your loss doubles.",
             best: false,
-            feedback: "A probable beat is not a predictable reaction. Sizing up adds risk, not edge.",
+            feedback:
+              "A probable beat is not a predictable reaction. Sizing up adds risk, not edge.",
           },
         ],
       },
-      takeaway: "Around earnings, the implied move — not your stop — describes your realistic risk.",
+      takeaway:
+        "Around earnings, the implied move — not your stop — describes your realistic risk.",
     },
     {
       kind: "practice",
@@ -118,7 +136,8 @@ export const lesson07EarningsSeason: CourseLesson = {
               id: "cm-l7-q1",
               type: "numeric",
               topic: "events",
-              prompt: "Consensus EPS is $1.00 and actual EPS is $1.10. What is the surprise in percent?",
+              prompt:
+                "Consensus EPS is $1.00 and actual EPS is $1.10. What is the surprise in percent?",
               answer: 10,
               tolerance: 0.1,
               unit: "%",
@@ -132,7 +151,8 @@ export const lesson07EarningsSeason: CourseLesson = {
               id: "cm-l7-q2",
               type: "numeric",
               topic: "events",
-              prompt: "A $50 stock has an implied earnings move of ±6%. How many dollars is that either way?",
+              prompt:
+                "A $50 stock has an implied earnings move of ±6%. How many dollars is that either way?",
               answer: 3,
               tolerance: 0.05,
               unit: "USD",
@@ -155,7 +175,8 @@ export const lesson07EarningsSeason: CourseLesson = {
               id: "cm-l7-q3",
               type: "mcq",
               topic: "events",
-              prompt: "A company beats EPS estimates, yet the stock falls 8%. Which explanation fits best?",
+              prompt:
+                "A company beats EPS estimates, yet the stock falls 8%. Which explanation fits best?",
               options: [
                 "Management lowered guidance for future quarters",
                 "Beating estimates is always bad news",
@@ -222,7 +243,9 @@ export const lesson07EarningsSeason: CourseLesson = {
       id: "cm-l7-b8",
       title: "Reflection",
       helper: "One or two sentences. Stays in your browser.",
-      prompts: ["What is your personal rule for holding (or not holding) positions through earnings?"],
+      prompts: [
+        "What is your personal rule for holding (or not holding) positions through earnings?",
+      ],
     },
     {
       kind: "summary",

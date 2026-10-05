@@ -12,7 +12,7 @@
 - [x] 2.2 Course 3 — Charting & Technical Analysis (3 / 9: candles & structure, trends/ranges/levels, indicators & limits); verify gates incl. candle/level consistency
 - [x] 2.3 Course 4 — Markets & Instruments (4 / 12: stocks, indices & ETFs, commodities, forex); verify gates incl. per-instrument numeric facts (tick values, pip values, contract sizes)
 - [x] 2.4 Course 5 — Market Structure & Microstructure (3 / 8: auctions/books/liquidity, execution & costs, who moves markets); verify gates incl. order-book walks
-- [ ] 2.5 Course 6 — Company & Macro Analysis (3 / 8: reading a company, macro drivers, events & calendars); verify gates
+- [x] 2.5 Course 6 — Company & Macro Analysis (3 / 8: reading a company, macro drivers, events & calendars); verify gates
 - [ ] 2.6 Course 7 — Crypto Foundations (4 / 12: Bitcoin, Ethereum & tokens, on-chain & DeFi, security & scams); verify gates incl. on-chain example arithmetic
 - [ ] 2.7 Course 8 — Crypto Speculation (2 / 5: memecoins & narratives, volatility & crypto risk); verify gates
 - [ ] 2.8 Course 9 — Derivatives Foundations (3 / 9: what derivatives are, futures, perpetuals & leverage); verify gates incl. leverage/liquidation arithmetic

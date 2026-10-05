@@ -29,9 +29,15 @@ export const lesson04InterestRates: CourseLesson = {
           "Higher rates also attract capital into a currency and raise borrowing costs for companies and households, which can slow growth.",
         ],
         keyTerms: [
-          { term: "Present value", definition: "Today's worth of a future cash flow, discounted at a rate." },
+          {
+            term: "Present value",
+            definition: "Today's worth of a future cash flow, discounted at a rate.",
+          },
           { term: "Yield", definition: "The return implied by a bond's price and payments." },
-          { term: "Duration", definition: "How sensitive an asset's price is to changes in rates." },
+          {
+            term: "Duration",
+            definition: "How sensitive an asset's price is to changes in rates.",
+          },
         ],
         callouts: [
           {
@@ -53,7 +59,8 @@ export const lesson04InterestRates: CourseLesson = {
           { label: "Yields rise to 5%", detail: "Price = 1,040 ÷ 1.05 = $990.48." },
           { label: "Change", detail: "The bondholder loses $9.52 on paper — about 0.95%." },
         ],
-        takeaway: "The payment did not change; only the rate used to value it did. That alone moved the price.",
+        takeaway:
+          "The payment did not change; only the rate used to value it did. That alone moved the price.",
       },
     },
     {
@@ -79,7 +86,8 @@ export const lesson04InterestRates: CourseLesson = {
       title: "Rate surprise",
       interaction: {
         type: "scenario-decision",
-        prompt: "The central bank signals rates will stay higher for longer than markets expected. What is the most reasonable reading?",
+        prompt:
+          "The central bank signals rates will stay higher for longer than markets expected. What is the most reasonable reading?",
         situation: [
           "You hold a mix of short-term bonds and fast-growing tech stocks.",
           "Nothing about the companies' businesses has changed today.",
@@ -87,13 +95,16 @@ export const lesson04InterestRates: CourseLesson = {
         choices: [
           {
             label: "Expect pressure on long-duration assets and review your risk",
-            outcome: "Growth stocks and long bonds drop more than short bonds; your plan already sized for it.",
+            outcome:
+              "Growth stocks and long bonds drop more than short bonds; your plan already sized for it.",
             best: true,
-            feedback: "Right — higher discount rates hit distant cash flows hardest. This is context, not a forecast.",
+            feedback:
+              "Right — higher discount rates hit distant cash flows hardest. This is context, not a forecast.",
           },
           {
             label: "Assume nothing changes because company earnings did not change",
-            outcome: "Prices reprice anyway, because the rate used to value those earnings changed.",
+            outcome:
+              "Prices reprice anyway, because the rate used to value those earnings changed.",
             best: false,
             feedback: "Value depends on both cash flows and the discount rate.",
           },
@@ -101,11 +112,13 @@ export const lesson04InterestRates: CourseLesson = {
             label: "Conclude higher rates are always good for stocks",
             outcome: "Valuations compress across the market.",
             best: false,
-            feedback: "Higher rates generally lower present values; effects vary, but 'always good' is wrong.",
+            feedback:
+              "Higher rates generally lower present values; effects vary, but 'always good' is wrong.",
           },
         ],
       },
-      takeaway: "Rates are an input to every valuation. Know which of your positions are most rate-sensitive.",
+      takeaway:
+        "Rates are an input to every valuation. Know which of your positions are most rate-sensitive.",
     },
     {
       kind: "practice",
@@ -120,13 +133,16 @@ export const lesson04InterestRates: CourseLesson = {
               id: "cm-l4-q1",
               type: "numeric",
               topic: "macro",
-              prompt: "A bond pays $1,040 in one year. What is its price at a 5% yield, in dollars?",
+              prompt:
+                "A bond pays $1,040 in one year. What is its price at a 5% yield, in dollars?",
               answer: 990.48,
               tolerance: 0.5,
               unit: "USD",
               explain: "Price = 1,040 ÷ 1.05 = $990.48.",
             },
-            feedbackByAnswer: { numeric: "Divide the payment by 1 + yield: 1,040 ÷ 1.05 ≈ 990.48." },
+            feedbackByAnswer: {
+              numeric: "Divide the payment by 1 + yield: 1,040 ÷ 1.05 ≈ 990.48.",
+            },
           },
           {
             skill: "Present value",
@@ -227,7 +243,9 @@ export const lesson04InterestRates: CourseLesson = {
       id: "cm-l4-b8",
       title: "Reflection",
       helper: "One or two sentences. Stays in your browser.",
-      prompts: ["Which assets you follow would you expect to be most sensitive to rate changes, and why?"],
+      prompts: [
+        "Which assets you follow would you expect to be most sensitive to rate changes, and why?",
+      ],
     },
     {
       kind: "summary",

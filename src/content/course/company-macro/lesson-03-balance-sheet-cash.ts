@@ -31,7 +31,10 @@ export const lesson03BalanceSheetCash: CourseLesson = {
         keyTerms: [
           { term: "Net debt", definition: "Total debt minus cash." },
           { term: "Free cash flow", definition: "Operating cash flow minus capital expenditure." },
-          { term: "Leverage ratio", definition: "Net debt ÷ EBITDA, in years of operating profit." },
+          {
+            term: "Leverage ratio",
+            definition: "Net debt ÷ EBITDA, in years of operating profit.",
+          },
         ],
         callouts: [
           {
@@ -55,7 +58,8 @@ export const lesson03BalanceSheetCash: CourseLesson = {
           { label: "Free cash flow", detail: "$90m − $40m = $50m." },
           { label: "Per share", detail: "$50m ÷ 50m shares = $1.00 of FCF per share." },
         ],
-        takeaway: "Two years of operating profit would clear the net debt; $1 per share of real cash is generated each year.",
+        takeaway:
+          "Two years of operating profit would clear the net debt; $1 per share of real cash is generated each year.",
       },
     },
     {
@@ -85,7 +89,8 @@ export const lesson03BalanceSheetCash: CourseLesson = {
       title: "Profit up, cash down",
       interaction: {
         type: "scenario-decision",
-        prompt: "Net income rose 30% but operating cash flow fell 20% and receivables doubled. How do you read it?",
+        prompt:
+          "Net income rose 30% but operating cash flow fell 20% and receivables doubled. How do you read it?",
         situation: [
           "Receivables are sales booked but not yet paid by customers.",
           "Management calls it 'timing'.",
@@ -93,7 +98,8 @@ export const lesson03BalanceSheetCash: CourseLesson = {
         choices: [
           {
             label: "Treat it as a warning to investigate collection quality",
-            outcome: "You dig in and find large customers paying slower — a real risk the headline hid.",
+            outcome:
+              "You dig in and find large customers paying slower — a real risk the headline hid.",
             best: true,
             feedback: "Right — rising receivables can mean aggressive booking or weak customers.",
           },
@@ -101,7 +107,8 @@ export const lesson03BalanceSheetCash: CourseLesson = {
             label: "Trust net income; cash will catch up",
             outcome: "Two quarters later the company writes off unpaid invoices.",
             best: false,
-            feedback: "Accruals can be optimistic. Cash confirms profit; it does not follow automatically.",
+            feedback:
+              "Accruals can be optimistic. Cash confirms profit; it does not follow automatically.",
           },
           {
             label: "Assume fraud and short it immediately",
@@ -244,7 +251,8 @@ export const lesson03BalanceSheetCash: CourseLesson = {
         "FCF = operating cash flow − capex.",
         "Profit and cash can diverge; persistent gaps deserve scrutiny.",
       ],
-      nextStep: "Next module: the macro forces that move every company at once, starting with interest rates.",
+      nextStep:
+        "Next module: the macro forces that move every company at once, starting with interest rates.",
     },
   ],
 };
