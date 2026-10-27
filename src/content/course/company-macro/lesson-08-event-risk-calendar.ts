@@ -140,7 +140,8 @@ export const lesson08EventRiskCalendar: CourseLesson = {
               answer: 100,
               tolerance: 0.5,
               unit: "shares",
-              explain: "Risk = $200. $200 ÷ $2 = 100 shares.",
+              explain:
+                "One percent of $20,000 is $200 of risk, and $200 divided by the $2 stop gives 100 shares.",
             },
             feedbackByAnswer: { numeric: "1% of 20,000 = 200; 200 ÷ 2 = 100." },
           },

@@ -141,7 +141,8 @@ export const lesson07EarningsSeason: CourseLesson = {
               answer: 10,
               tolerance: 0.1,
               unit: "%",
-              explain: "(1.10 − 1.00) ÷ 1.00 = 0.10 = 10%.",
+              explain:
+                "Surprise is actual minus consensus over consensus: 0.10 divided by 1.00 is a 10 percent beat.",
             },
             feedbackByAnswer: { numeric: "Difference ÷ consensus: 0.10 ÷ 1.00 = 10%." },
           },
@@ -230,7 +231,8 @@ export const lesson07EarningsSeason: CourseLesson = {
                 answer: 4,
                 tolerance: 0.05,
                 unit: "USD",
-                explain: "5% × $80 = $4, so roughly $76 to $84.",
+                explain:
+                  "The typical post-earnings range spans 5 percent each way: 5 percent of $80 is $4, hence $76 to $84.",
               },
               feedbackByAnswer: { numeric: "0.05 × 80 = 4." },
             },

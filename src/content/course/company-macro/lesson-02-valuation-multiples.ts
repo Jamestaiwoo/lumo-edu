@@ -141,7 +141,7 @@ export const lesson02ValuationMultiples: CourseLesson = {
               prompt: "A stock trades at $21 with EPS of $1.05. What is its P/E?",
               answer: 20,
               tolerance: 0.1,
-              explain: "P/E = price ÷ EPS = 21 ÷ 1.05 = 20.",
+              explain: "P/E is price divided by EPS: 21 divided by 1.05 equals 20 for this stock.",
             },
             feedbackByAnswer: { numeric: "Divide price by EPS: 21 ÷ 1.05 = 20." },
           },

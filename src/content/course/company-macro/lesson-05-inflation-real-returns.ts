@@ -132,7 +132,8 @@ export const lesson05InflationRealReturns: CourseLesson = {
               answer: 2,
               tolerance: 0.1,
               unit: "%",
-              explain: "Real ≈ nominal − inflation = 5 − 3 = 2%.",
+              explain:
+                "The quick real-return estimate subtracts inflation from the nominal return: 5 minus 3 is 2 percent.",
             },
             feedbackByAnswer: { numeric: "Subtract inflation from the nominal return: 5 − 3 = 2." },
           },
@@ -147,7 +148,8 @@ export const lesson05InflationRealReturns: CourseLesson = {
               answer: 10400,
               tolerance: 1,
               unit: "USD",
-              explain: "$10,000 × 1.04 = $10,400.",
+              explain:
+                "The basket costs 4 percent more, so $10,000 of spending power becomes $10,400.",
             },
             feedbackByAnswer: { numeric: "Grow the amount by inflation: 10,000 × 1.04 = 10,400." },
           },

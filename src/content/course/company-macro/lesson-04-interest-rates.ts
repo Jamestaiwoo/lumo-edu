@@ -138,7 +138,8 @@ export const lesson04InterestRates: CourseLesson = {
               answer: 990.48,
               tolerance: 0.5,
               unit: "USD",
-              explain: "Price = 1,040 ÷ 1.05 = $990.48.",
+              explain:
+                "The bond price is its payment discounted one year: 1,040 divided by 1.05 equals 990.48.",
             },
             feedbackByAnswer: {
               numeric: "Divide the payment by 1 + yield: 1,040 ÷ 1.05 ≈ 990.48.",
@@ -230,7 +231,8 @@ export const lesson04InterestRates: CourseLesson = {
                 answer: 1000,
                 tolerance: 1,
                 unit: "USD",
-                explain: "1,100 ÷ 1.10 = $1,000.",
+                explain:
+                  "Discount the payment by one year at 10 percent: 1,100 divided by 1.10 equals 1,000.",
               },
               feedbackByAnswer: { numeric: "1,100 ÷ 1.10 = 1,000." },
             },
