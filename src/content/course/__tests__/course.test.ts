@@ -16,6 +16,10 @@ import {
 const course = COURSES[0]!;
 
 describe("course registry", () => {
+  it("registers all eighteen planned courses", () => {
+    expect(COURSES).toHaveLength(18);
+  });
+
   it("exposes Trading Foundations as the first course", () => {
     expect(course.id).toBe("c1");
     expect(course.title).toBe("Trading Foundations");

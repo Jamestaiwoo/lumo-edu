@@ -5,7 +5,7 @@ import { Disclaimer } from "@/components/Disclaimer";
 import { useProgress, useTopicStats, type LessonProgress } from "@/lib/api";
 import { ErrorState, LoadingState } from "@/components/state/StateViews";
 import { LESSON_ORDER, TOPIC_LABELS } from "@/content/curriculum";
-import { COURSES, courseLessons } from "@/content/course";
+import { COURSES, COURSE_LESSON_ORDER, courseLessons } from "@/content/course";
 import { getLessonForTopic, getRecommendedLesson } from "@/lib/recommendation";
 
 export const Route = createFileRoute("/_authenticated/learn/")({
@@ -63,9 +63,19 @@ function LearnPath() {
     };
   };
   const courseUnlockedIndex = (courseId: string) => {
-    const ids = courseLessons(courseId).map((l) => l.id);
-    const idx = ids.findIndex((id) => !doneMap.has(id));
-    return idx === -1 ? ids.length : idx;
+    const ids = courseLessons(courseId).map((lesson) => lesson.id);
+    const firstIncompleteGlobalIndex = COURSE_LESSON_ORDER.findIndex((id) => !doneMap.has(id));
+    const globalUnlockedIndex =
+      firstIncompleteGlobalIndex === -1 ? COURSE_LESSON_ORDER.length : firstIncompleteGlobalIndex;
+    const currentCourseIndex = ids.findIndex(
+      (id) => COURSE_LESSON_ORDER.indexOf(id) === globalUnlockedIndex,
+    );
+
+    if (currentCourseIndex >= 0) return currentCourseIndex;
+    if (ids.every((id) => COURSE_LESSON_ORDER.indexOf(id) < globalUnlockedIndex)) {
+      return ids.length;
+    }
+    return -1;
   };
   const doneMap = new Map(
     progress
